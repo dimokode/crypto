@@ -54,7 +54,7 @@ class fs {
         return $ans;
     }
 
-    static function getFilesInFolder($path_to_folder, $options = []){
+    static function getFilesInFolder_old($path_to_folder, $options = []){
             $ans = [];
             $arrFiles = [];
             $arrFile = [];
@@ -103,6 +103,55 @@ class fs {
             //wrlog(print_r($arrFiles, true), 'files.txt');
       return $ans;
     }
+
+
+    static function getFilesInFolder($path_to_folder, $options = []){
+        $ans = [];
+        $arrFiles = [];
+        $arrFile = [];
+        if(file_exists($path_to_folder)){
+            $files = array_diff(scandir($path_to_folder, SCANDIR_SORT_ASCENDING), ['..', '.']);
+            wrlog($files);
+            foreach($files as $key => $filename){
+
+                $fileInfo = new SplFileInfo($path_to_folder."/".$filename);
+                $arrFile = [];
+                if(isset($options['fileExtension'])){
+                    if($fileInfo->getExtension() == $options['fileExtension']){
+                        //array_push($arrFiles, $file);
+                        $arrFile['filename'] = $filename;
+                        $arrFile['extension'] = $fileInfo->getExtension();
+                        $arrFile['timestamp'] = $fileInfo->getCTime();
+                        $arrFile['size'] = $fileInfo->getSize();
+                        array_push($arrFiles, $arrFile);
+                    }
+                }else{
+                    //array_push($arrFiles, $file);
+                    $arrFile['filename'] = $filename;
+                    $arrFile['extension'] = $fileInfo->getExtension();
+                    $arrFile['timestamp'] = $fileInfo->getCTime();
+                    $arrFile['size'] = $fileInfo->getSize();
+                    array_push($arrFiles, $arrFile);
+                }
+
+            }
+
+
+
+        
+            $ans['success'] = true;
+            $ans['arrFiles'] = $arrFiles;
+        }else{
+            //wrlog("Folder $path doesn't  exist");
+            $ans['success'] = false;
+            $ans['error'] = "Folder $path doesn't exist";
+            //$ans['success'] = true;
+            //$ans['files'] = $arrFiles;
+        }
+        //wrlog(print_r($arrFiles, true), 'files.txt');
+  return $ans;
+}
+
 
     static function saveContentToFile($path_to_file, $content){
         //wrlog($content);

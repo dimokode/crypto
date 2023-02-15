@@ -43,6 +43,7 @@ class Symbols3 {
         $response = fs::getFilesInFolder($path_to_folder);
         if($response['success']){
             $arrFiles = $response['arrFiles'];
+            //wrlog($arrFiles);
             $filesCount = sizeof($arrFiles);
             if($filesCount > 1){
                 $actualFile = $arrFiles[$filesCount-1];
