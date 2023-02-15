@@ -1,0 +1,6 @@
+{
+    "require": {
+        "devcoder-xyz/php-dotenv": "^2.1",
+        "jaggedsoft/php-binance-api": "^0.5.28"
+    }
+}

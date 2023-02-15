@@ -1,0 +1,14 @@
+.scalp {
+    /*background: grey;*/
+    padding: 10px;
+}
+
+.scalp>span {
+    padding: 2px;
+    display: inline-block;
+}
+
+.scalp>span.symbol {
+    width: 160px;
+    background: yellow;
+}

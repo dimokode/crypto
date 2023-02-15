@@ -1,0 +1,31 @@
+popup {
+	background: white;
+	position: fixed;
+	/*position: absolute;*/
+	top: 10px;
+	left:2%;
+	width: 96%;
+	height: 96%;
+	padding: 15px;
+	/*margin: 2%;*/
+	display: none;
+	z-index: 1000;
+	opacity: 0.95;
+	border: 5px solid #eee;
+	overflow-y: scroll;
+}
+
+
+popup>popup-header div.row {
+    display: inline-block;
+    margin: 10px;
+}
+
+popup>popup-header div {
+    font-weight: bold;
+}
+
+popup>popup-header div>span {
+    font-weight: normal;
+    margin-left: 10px;
+}

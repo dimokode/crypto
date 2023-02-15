@@ -1,0 +1,52 @@
+<h2>Trade</h2>
+
+
+Symbol1:
+<input id="symbol1" type="text" value="BTC">
+Symbol2:
+<input id="symbol2" type="text" value="USDT">
+<button type="button" class="w3-button w3-green" onclick="trade.openSymbolTrades();">Open Trades</button>
+<button type="button" class="w3-button w3-red" onclick="Symbols3.retrieveOpenOrdersFromBinanceForPair(trade.getSymbolFromInputs('symbol1', 'symbol2'));" disabled>Get Open Trades For Pair</button>
+<!--button type="button" class="w3-button w3-red" onclick="trade.openSymbolTrades();">Close Trades</button-->
+<hr>
+<trade-content>
+
+    <div class="chart">
+        <chart></chart>
+    </div>
+    <div class="orderForm">
+
+        <div class="w3-bar w3-black">
+            <button class="w3-bar-item w3-button w3-green" width="50%" onclick="tabs.open('buy')">Buy</button>
+            <button class="w3-bar-item w3-button w3-red" width="50%" onclick="tabs.open('sell')">Sell</button>
+        </div>
+        <div id="buy" class="w3-container tab">
+            <select name="orderType" group="buy" id="orderType" onchange="tabs.openSelect(this);">
+                <option value="market" selected>Market</option>
+                <option value="limitorder">Limit Order</option>
+                <option value="stoplimit">Stop Limit</option>
+            </select>
+
+            <div id="market" class="tab" style="display:block;">
+                market
+            </div>
+            <div id="limitorder" class="tab" style="display:none;">
+                limitorder
+            </div>
+            <div id="stoplimit" class="tab" style="display:none;">
+                stoplimit
+            </div>
+        </div>
+        
+        <div id="sell" class="w3-container tab" style="display:none">
+            <h2>Paris</h2>
+            <p>Paris is the capital of France.</p>
+        </div>
+
+    </div>
+
+    <div class="openOrders">
+        <orders></orders>
+    </div>
+
+</trade-content>

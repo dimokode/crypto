@@ -1,0 +1,36 @@
+form {
+    padding: 10px;
+}
+
+form label {
+    font-size: 0.8em;
+    display : block;
+}
+
+form .form_element_error {
+    background: pink;
+}
+
+.inline {
+    display: inline-block;
+}
+
+form div {
+    padding: 1px;
+}
+
+
+.removeElement {
+    position : relative;
+    color : red;
+    background: yellow;
+    width : 10px;
+    height: 10px;
+    top : -10px;
+    left : 1px;
+    cursor: pointer;
+}
+
+.appContainer{
+    min-height: 20px;
+}

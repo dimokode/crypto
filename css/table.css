@@ -1,0 +1,18 @@
+table>thead {
+    position:sticky;
+    top:0px;
+    background: #eee;
+    
+}
+
+.th-clickable:hover {
+    cursor: pointer;
+}
+
+th.asc::after {
+    content : '\25B2';
+}
+
+th.desc::after {
+    content : '\25BC';
+}

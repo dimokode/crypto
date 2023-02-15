@@ -1,0 +1,14 @@
+composer.phar
+/vendor/
+
+.env
+
+/db/
+/logs/
+/phplightadmin/
+
+/*.txt
+/*.txt.bak
+/*.html
+
+/ca.pem
