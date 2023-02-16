@@ -24,15 +24,15 @@ async function doIt(){
         console.log(data);
         const ss = new Set();
         data.forEach(symbolData => {
-            console.log(symbolData);
+            //console.log(symbolData);
             
             const symbol = symbolData.filename.split('.')[0];
-            console.log(symbol);
+            //console.log(symbol);
 
             stablecoins.forEach( stablecoin => {
                 //console.log(stablecoin);
                 const pos = symbol.indexOf(stablecoin);
-                console.log(pos);
+                //console.log(pos);
                 if(pos !== -1){
                     const asset = symbol.slice(0, pos);
                     console.log(asset);
@@ -41,7 +41,15 @@ async function doIt(){
             });
             
         });
-        console.log([...ss]);
+        const arrAssets = [...ss];
+        //console.log(arrAssets);
+        const balances = await Symbols3.getBalances();
+        console.log('balances', balances);
+        const filteredBalances = Symbols3.filterBalances2(balances, arrAssets);
+        console.log('filteredBalances', filteredBalances);
+        //arrAssets.forEach( asset => {
+            //console.log(asset);
+        //});
     }else{
         console.log('something goes wrong!');
     }

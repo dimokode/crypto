@@ -125,7 +125,7 @@
 
 
 
-    function filterBalances(dataBalances){
+    function filterBalances(dataBalances, removeZeroBalances = false){
         let dataFiat = {}
         //remove assets with zero balance and UAH ans USDT assets
         for(let assetId in dataBalances){
@@ -136,18 +136,21 @@
                     && dataBalances[assetId]['onOrder']['actual'] == 0
                         && dataBalances[assetId]['onOrder']['previous'] == 0){
                 */
-
-            if(Number(dataBalances[assetId]['available']['actual']) == 0 && Number(dataBalances[assetId]['onOrder']['actual']) == 0){
+            if(removeZeroBalances){
+                if(Number(dataBalances[assetId]['available']['actual']) == 0 && Number(dataBalances[assetId]['onOrder']['actual']) == 0){
                 
-                if(Number(dataBalances[assetId]['available']['previous']) !== undefined && Number(dataBalances[assetId]['onOrder']['previous']) !== undefined){
-                    if(Number(dataBalances[assetId]['available']['previous']) == 0 && Number(dataBalances[assetId]['onOrder']['previous']) == 0){
+                    if(Number(dataBalances[assetId]['available']['previous']) !== undefined && Number(dataBalances[assetId]['onOrder']['previous']) !== undefined){
+                        if(Number(dataBalances[assetId]['available']['previous']) == 0 && Number(dataBalances[assetId]['onOrder']['previous']) == 0){
+                            delete(dataBalances[assetId])
+                        }
+                    }else{
                         delete(dataBalances[assetId])
                     }
-                }else{
-                    delete(dataBalances[assetId])
                 }
+            }
 
-            }else if(assetId=='USDT' || assetId=='UAH'){
+
+            if(assetId=='USDT' || assetId=='UAH'){
                 dataFiat[assetId] = dataBalances[assetId]
                 delete(dataBalances[assetId])
             }
@@ -546,7 +549,7 @@
         }
     
         return common.sendAjax(balancesRequestObj).then(function(response){
-            console.log(response);
+            //console.log(response);
             
                 if(response['success']){
                     return response['data'];
@@ -571,6 +574,43 @@
             }).catch( err => console.error(err));
     }
 
+
+    function filterBalances2(objBalances, arrAssets){
+        const actual = objBalances.actual.data;
+        const previous = objBalances.previous.data;
+        const filteredActual = {};
+        const filteredPrevious = {};
+        const objFilteredBalances = {
+            'actual':{
+                'timestamp':objBalances.actual.timestamp,
+                'data':{}
+            },
+            'previous':{
+                'timestamp':objBalances.previous.timestamp,
+                'data':{}
+            }
+        }
+
+        for(asset in actual){
+            console.log(asset);
+            if(arrAssets.includes(asset)){
+                filteredActual[asset] = actual[asset];
+            }
+        }
+        //return filteredActual;
+
+        for(asset in previous){
+            console.log(asset);
+            if(arrAssets.includes(asset)){
+                filteredPrevious[asset] = previous[asset];
+            }
+        }
+        //return filteredActual;
+        objFilteredBalances.actual.data = filteredActual;
+        objFilteredBalances.previous.data = filteredPrevious;
+        return objFilteredBalances;
+
+    }
 
 
 
@@ -965,6 +1005,10 @@
     Symbols3.show = show;
     Symbols3.createTable = createTable;
     Symbols3.getBalances = getBalances;
+    
+    Symbols3.filterBalances2 = filterBalances2;
+
+
     Symbols3.getPrices = getPrices;
     Symbols3.showOrdersByPair = showOrdersByPair;
     Symbols3.updateRow = updateRow;
