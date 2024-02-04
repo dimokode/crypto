@@ -85,6 +85,9 @@ function createSelect(obj){
     return div.innerHTML;
 }
 
+
+
+
 function createTable(tableId = null, structure, rowButtons = {}){
     document.querySelectorAll('template').forEach(function(item){
         item.remove();
@@ -143,7 +146,6 @@ function createTable(tableId = null, structure, rowButtons = {}){
             }else{
                 th.setAttribute(attr, structure[elem][attr]);
             }
-            
         }
 
 
@@ -178,6 +180,18 @@ function createTable(tableId = null, structure, rowButtons = {}){
         if(structure[elem]['contenteditable']){
             td.setAttribute('contentEditable', true);
         }
+
+        //events
+        if(structure[elem]['events']){
+            for(let event in structure[elem]['events']){
+                td.setAttribute(event, structure[elem]['events'][event]);
+            }
+        }
+
+        //add classes to TD
+        if(structure[elem]['class']){
+            td.classList.add(structure[elem]['class']);
+        }
         
         templateRow.appendChild(td);
         tr.appendChild(th);
@@ -211,8 +225,9 @@ function swapCheckboxes(el){
     cbs.forEach( cb => {
         cb.checked = cbState;
     });
-
 }
+
+
 
 function parseDatasource(strDatasource){
     //let regExp = /(.*?):(.*?)\[(.*?)\]/;
@@ -379,8 +394,6 @@ function getAttributesObject(attributesNamedNodeMap){
 
 
 function extractDataFromTableRow(trElement, colTag = 'td', cols){
-
-
     let obj = {};
     const tds = trElement.querySelectorAll(colTag);
     //console.log(tds);
@@ -417,6 +430,7 @@ function deleteRow(el){
     console.log(element);
     element.remove();
 }
+
 
 function addSelect(el){
     let tdValue = el.innerHTML;
@@ -598,8 +612,8 @@ function colorizeRows(params){
     const conditions = params.field.conditions;
     trs.forEach( tr => {
         let value = tr.querySelector(`td[name="${fieldName}"]`).dataset.value.toLowerCase();
-        console.log(value);
-        console.log(conditions[value]);
+        //console.log(value);
+        //console.log(conditions[value]);
         if(conditions[value] !== undefined){
             tr.classList.add(conditions[value]);
         }
@@ -659,12 +673,18 @@ function updateRow(tableId, rowId, rowData){
 }
 
 function getTableIdByTdElement(el){
+    if(el.tagName === 'TD'){
+        return $(el).parent('tr').parent('tbody').parent('table').attr('id');
+    }
     return $(el).parent('td').parent('tr').parent('tbody').parent('table').attr('id');
     //let price = Number($(el).parent('td').parent('tr').find('td[name="price"]').text());
     //let available = Number($(el).parent('td').parent('tr').find('td[name="available"]').text());
 }
 
 function getRowIdByTdElement(el){
+    if(el.tagName === 'TD'){
+        return $(el).parent('tr').attr('name');    
+    }
     return $(el).parent('td').parent('tr').attr('name');
     //let price = Number($(el).parent('td').parent('tr').find('td[name="price"]').text());
     //let available = Number($(el).parent('td').parent('tr').find('td[name="available"]').text());
@@ -733,11 +753,18 @@ function updateTableStyle(tableId, rowId, objTableStyle){
         let tdElement = rowElement.querySelector('td[name="'+tdId+'"]')
         if(tdElement){
             for(let attr in objTableStyle[tdId]){
-                tdElement.setAttribute(attr, objTableStyle[tdId][attr])
+                if(attr == 'class'){
+                    tdElement.classList.add(objTableStyle[tdId][attr])
+                }else{
+                    tdElement.setAttribute(attr, objTableStyle[tdId][attr])
+                }
+                
             }
         }
     }
 }
+
+
 
 function setTableId(tableId){
     tableto.tableId = tableId;
@@ -807,8 +834,8 @@ function sort(tableId, fieldName = '', type = 'desc'){
     });
 
 
-    console.log('arrRowElements', arrRowElements);
-    console.log(objSortField)
+    //console.log('arrRowElements', arrRowElements);
+    //console.log(objSortField)
 
 
     keysSorted = Object.keys(objSortField).sort(function(a,b){
@@ -819,7 +846,7 @@ function sort(tableId, fieldName = '', type = 'desc'){
         }
     })
 
-    console.log('keysSorted', keysSorted);
+    //console.log('keysSorted', keysSorted);
     
 
     //tableElement.querySelector('tbody').remove()

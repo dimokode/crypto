@@ -1,5 +1,7 @@
 composer.phar
 /vendor/
+/alex/
+.DS_Store
 
 .env
 

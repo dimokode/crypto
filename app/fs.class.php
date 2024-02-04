@@ -54,56 +54,6 @@ class fs {
         return $ans;
     }
 
-    static function getFilesInFolder_old($path_to_folder, $options = []){
-            $ans = [];
-            $arrFiles = [];
-            $arrFile = [];
-            if(file_exists($path_to_folder)){
-                //wrlog("Folder $path exists");
-                if ($handle = opendir($path_to_folder)) {
-                    while (false !== ($file = readdir($handle))) { 
-                        if ($file != "." && $file != ".." && is_file($path_to_folder."/".$file)) {
-                            $fileInfo = new SplFileInfo($path_to_folder."/".$file);
-                            $arrFile = [];
-                            if(isset($options['fileExtension'])){
-                                if($fileInfo->getExtension() == $options['fileExtension']){
-                                    //array_push($arrFiles, $file);
-                                    $arrFile['filename'] = $file;
-                                    $arrFile['extension'] = $fileInfo->getExtension();
-                                    $arrFile['timestamp'] = $fileInfo->getCTime();
-                                    $arrFile['size'] = $fileInfo->getSize();
-                                    array_push($arrFiles, $arrFile);
-                                }
-                            }else{
-                                //array_push($arrFiles, $file);
-                                $arrFile['filename'] = $file;
-                                $arrFile['extension'] = $fileInfo->getExtension();
-                                $arrFile['timestamp'] = $fileInfo->getCTime();
-                                $arrFile['size'] = $fileInfo->getSize();
-                                array_push($arrFiles, $arrFile);
-                            }
-                            //$arrFile['timestamp'] = $fileInfo->getMTime();
-                            
-                            //array_push($arrFiles, mb_convert_encoding($fileInfo->getBasename('.php'), 'ASCII'));//remove extension
-                            
-                        }
-                    }
-                    closedir($handle);
-                }
-            
-                $ans['success'] = true;
-                $ans['arrFiles'] = $arrFiles;
-            }else{
-                //wrlog("Folder $path doesn't  exist");
-                $ans['success'] = false;
-                $ans['error'] = "Folder $path doesn't exist";
-                //$ans['success'] = true;
-                //$ans['files'] = $arrFiles;
-            }
-            //wrlog(print_r($arrFiles, true), 'files.txt');
-      return $ans;
-    }
-
 
     static function getFilesInFolder($path_to_folder, $options = []){
         $ans = [];
@@ -144,7 +94,7 @@ class fs {
         }else{
             //wrlog("Folder $path doesn't  exist");
             $ans['success'] = false;
-            $ans['error'] = "Folder $path doesn't exist";
+            $ans['error'] = "Folder $path_to_folder doesn't exist";
             //$ans['success'] = true;
             //$ans['files'] = $arrFiles;
         }

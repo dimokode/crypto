@@ -221,7 +221,6 @@ async function getOrdersByPair(symbol){
     });
 
     tableto.sort('tableOrders', 'time');
-
 }
 
 function getSelectedOrders(tableId, popupId){

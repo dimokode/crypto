@@ -14,14 +14,14 @@ define("SECRET_KEY", getenv('SECRET_KEY'));
 define("ROOT_DIR", dirname (__FILE__));
 define("TPL_DIR", ROOT_DIR.'/tpl');
 define("APP_DIR", ROOT_DIR.'/app');
-define("PATH_TO_LOGS", ROOT_DIR.'/logs/');
+define("PATH_TO_LOGS", ROOT_DIR.'/logs');
 define("PATH_TO_DB", ROOT_DIR.'/db/');
 define("PATH_TO_CONFIG", ROOT_DIR.'/config');
 //define("FORMS_DIR", ROOT_DIR.'/forms');
 define("PATH_TO_SQLITE_FILE", ROOT_DIR.'/db/db.sqlite');
 define("SITE_URL", "http://".$_SERVER['HTTP_HOST']);
 
-define("FROM_FILE", true);
+define("FROM_FILE", false);
 
 
 include_once('dev_functions.php');

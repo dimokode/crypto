@@ -6,9 +6,9 @@
 
 
 
-function errlog($data){
+function errlog($data, $filename = "error_log.txt"){
     $arr = debug_backtrace();
-    $filename = "error_log.txt";
+    // $filename = "error_log.txt";
     if(gettype($data) == 'string' || gettype($data) == 'boolean'){
         strlog($data, $arr, $filename);
     }else{
@@ -16,10 +16,10 @@ function errlog($data){
     }
 }
 
-function wrlog($data){
+function wrlog($data, $filename = "log.txt"){
     $arr = debug_backtrace();
     //arrlog($arr, $arr, 'debug.txt');
-    $filename = "log.txt";
+    // $filename = "log.txt";
     if(gettype($data) == 'string' || gettype($data) == 'boolean'){
         strlog($data, $arr, $filename);
     }else{

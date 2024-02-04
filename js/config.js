@@ -1,3 +1,3 @@
 const stablecoins = [
-    'USDT', 'USDC', 'BUSD', 'USDC', 'UST'
+    'USDT', 'USDC', 'BUSD'
 ];

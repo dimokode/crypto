@@ -2,18 +2,28 @@
     function Symbols3(){}
 
     async function show() {
+        console.log('SHOWWWW!!!')
 
         const html = await template.loadRawTemplateFromFile('deposit.html');
         //console.log(response);
 
         $('content').html(html);
 
-        
         const tableFrameworkElement = createTable();
         document.querySelector('content-main').innerHTML = '';
         document.querySelector('content-main').appendChild( tableFrameworkElement );
 
-        let dataBalancesHistory = await getBalances();
+        let dataBalancesHistory_raw = await getBalances();
+        console.log('dataBalancesHistory_raw', dataBalancesHistory_raw);
+
+
+
+        // const arrAssets = await assets.getAssets();
+        const [arrAssets, LD_assets] = await assets.getAssets(dataBalancesHistory_raw);
+        console.log('arrAssets', arrAssets);
+        console.log('LD_assets', LD_assets);
+
+        dataBalancesHistory = Symbols3.filterBalances2(dataBalancesHistory_raw, arrAssets);
         console.log('dataBalancesHistory', dataBalancesHistory);
         
         let dataPrices = await getPrices();
@@ -24,6 +34,12 @@
         let preparedBalances = prepareBalances(dataBalancesHistory),
             dataBalances = preparedBalances['dataBalances'],
             dataFiat = preparedBalances['dataFiat'];
+
+        // add earn assets (LD)
+        for(let asset in dataBalances){
+            dataBalances[asset]['onLD'] = {}
+            dataBalances[asset]['onLD']['actual'] = LD_assets[asset] ? Number(LD_assets[asset]) : 0
+        }
         
 
         console.log('dataBalances', dataBalances);
@@ -49,7 +65,7 @@
             }
 
             assetObj = Object.assign(assetObj, dataBalances[assetId]);
-            //console.log(assetObj)
+            console.log(assetObj)
             tableto.addRow('tableBalance', assetObj);
             await calculateRow('tableBalance', assetId);
         }
@@ -101,8 +117,7 @@
         console.log('dataBalance', dataBalance);
         
         //remove assets with zero balance and UAH ans USDT assets
-        filteredBalances = filterBalances(dataBalance);
-        return filteredBalances;
+        return filterBalances(dataBalance,  removeZeroBalances=false);
     }
 
 
@@ -149,9 +164,16 @@
                 }
             }
 
-
+/*
             if(assetId=='USDT' || assetId=='UAH'){
                 dataFiat[assetId] = dataBalances[assetId]
+                delete(dataBalances[assetId])
+            }
+*/          
+            if(stablecoins.includes(assetId)){
+                if(dataBalances[assetId]){
+                    dataFiat[assetId] = dataBalances[assetId];
+                }
                 delete(dataBalances[assetId])
             }
         }
@@ -218,6 +240,10 @@
                 name : 'symbol',
                 type : 'text',
                 trId : true,
+                events : {
+                    onclick: 'assets.showAsset(this)'
+                },
+                class: 'clickable'
             },
             available : {
                 name : 'available',
@@ -226,6 +252,11 @@
             },
             onOrder : {
                 name : 'onOrder',
+                type : 'text',
+                sortable : true,
+            },
+            onLD : {
+                name : 'onLD',
                 type : 'text',
                 sortable : true,
             },
@@ -279,17 +310,34 @@
         return tableto.createTable('tableBalance', structure, rowButtons);
     }
 
+
+
+
     function btnUpdateOrdersForPair(el){
+        console.log('btnUpdateOrdersForPair');
         let tableId = tableto.getTableIdByTdElement(el);
         let symbol = rowId = tableto.getRowIdByTdElement(el);
         //const pair = symbol + 'USDT';
+        const promisesOrders = []
         stablecoins.forEach((stablecoin) => {
             let pair = symbol+stablecoin;
-            updateOrdersForPair(tableId, rowId, pair);  
+            promisesOrders.push( updateOrdersForPair(tableId, rowId, pair) );
         });
+        console.log('promisesOrders', promisesOrders);
+
+        Promise.all(promisesOrders).then( response => {
+            console.log('btnUpdateOrdersForPair', response);
+        }).catch( error => {
+            console.log('error', error);
+        }).finally(() => {
+            console.log('finally');
+        })
         //updateOrdersForPair(tableId, rowId, pair);
 
     }
+
+
+
 
     function updateOrdersForPair(tableId, rowId, pair){
         let objTableStyle = {
@@ -297,9 +345,9 @@
                 class : 'w3-pale-yellow'
             }
         }
-        tableto.updateTableStyle(tableId, rowId, objTableStyle)
+        // tableto.updateTableStyle(tableId, rowId, objTableStyle)
 
-        retrieveOrdersFromBinanceForPair(pair).then( objOrders => {
+        return retrieveOrdersFromBinanceForPair(pair).then( objOrders => {
             if(objOrders){
                 //console.log(objOrders)
                 objTableStyle = {
@@ -307,19 +355,17 @@
                         class : 'w3-pale-green'
                     }
                 }
-            }else{
-                /*
-                objTableStyle = {
-                    symbol : {
-                        class : 'w3-pale-red'
-                    }
-                }
-                */
+                return true
             }
-            tableto.updateTableStyle(tableId, rowId, objTableStyle)
+            return false
+            // tableto.updateTableStyle(tableId, rowId, objTableStyle)
             
         })
     }
+
+
+
+
 
     function retrieveOrdersFromBinanceForPair(pair){
         const objRequest = {
@@ -329,6 +375,7 @@
         }
 
         return common.sendAjax(objRequest).then( response => {
+            console.log('retrieveOrdersFromBinanceForPair', response);
             if(response.success){
                 return response.data;
             }else{
@@ -507,6 +554,8 @@
 
         let available = tableto.td(tableId, rowId, 'available').getData('actual')
         let onOrder = tableto.td(tableId, rowId, 'onOrder').getData('actual')
+        let onLD = tableto.td(tableId, rowId, 'onLD').getData('actual')
+
         tableto.td(tableId, rowId, 'onOrder').setData('value', onOrder);
 
         //tableto.setTdContent(rowId, 'price', priceToShow(price)+'<br>'+ `<span class="w3-text-grey">`+priceToShow(pricePrevious)+`</span>`)
@@ -521,6 +570,7 @@
             price : price,
             available : available,
             onOrder : onOrder,
+            onLD : onLD,
             //orders : response['data']
             orders : await orders.getOrdersBySymbol(rowId)
         }
@@ -536,8 +586,6 @@
         tableto.updateTableStyle(tableId, rowId, objTableStyle)
 
     }
-
-
 
 
 
@@ -559,6 +607,8 @@
             }).catch( err => console.error(err));
     }
 
+
+
     function getPrices(){
         const pricesRequestObj = {
             controller : 'symbols3',
@@ -576,6 +626,8 @@
 
 
     function filterBalances2(objBalances, arrAssets){
+        console.log('objBalances', objBalances)
+        console.log('arrAssets', arrAssets)
         const actual = objBalances.actual.data;
         const previous = objBalances.previous.data;
         const filteredActual = {};
@@ -591,23 +643,26 @@
             }
         }
 
-        for(asset in actual){
-            console.log(asset);
+        for(let asset in actual){
+            // console.log(actual);
             if(arrAssets.includes(asset)){
                 filteredActual[asset] = actual[asset];
             }
         }
+        console.log('filteredActual', filteredActual)
         //return filteredActual;
 
         for(asset in previous){
-            console.log(asset);
+            //console.log(asset);
             if(arrAssets.includes(asset)){
                 filteredPrevious[asset] = previous[asset];
             }
         }
+        console.log('filteredPrevious', filteredPrevious)
         //return filteredActual;
-        objFilteredBalances.actual.data = filteredActual;
-        objFilteredBalances.previous.data = filteredPrevious;
+        objFilteredBalances['actual']['data'] = filteredActual;
+        objFilteredBalances['previous']['data'] = filteredPrevious;
+        console.log('objFilteredBalances', objFilteredBalances)
         return objFilteredBalances;
 
     }
@@ -616,7 +671,7 @@
 
     async function showOrdersByPair(el){
         let tableId = tableto.getTableIdByTdElement(el);
-        let symbol = rowId = tableto.getRowIdByTdElement(el);
+        let symbol = rowId = tableto.getRowIdByTdElement(el);//rename symbol to asset
         //let price = tableto.getTdContent(tableId, rowId, 'price');
         let price = tableto.td(tableId, rowId, 'price').getData('actual');
         let available = tableto.getTdContent(tableId, rowId, 'available');
@@ -632,18 +687,22 @@
             symbol : symbol,
             price : price,
             available : available,
-            onOrder : onOrder
+            onOrder : onOrder,
+            orders : arrOrders
         }
         //console.log(objAnalitica)
-        const popupId = popup.new();
-        popup.show(popupId);
+        // const popupId = popup.new();
+        // popup.show(popupId);
+        const popup = new Popup2();
+        popup.show();
 
-        let htmlPopup = await template.loadRawTemplateFromFile('popup2.html');
+        let htmlPopup = await template.loadRawTemplateFromFile('ordersBySymbol.html');
             //console.log('answer:' + answer);
             if(htmlPopup){
-                popup.addContent(popupId, htmlPopup);
+                // popup.addContent(popupId, htmlPopup);
+                popup.header().insert(htmlPopup);
 
-                    objAnalitica['orders'] = arrOrders;
+                    //objAnalitica['orders'] = arrOrders;
                     //console.log(orders);
                     const structure = {
                         cb :{
@@ -699,7 +758,9 @@
                     }
     
                     let tableContent = tableto.createTable('tableOrders', structure);
-                    $('#popup-content').html(tableContent);
+                    //$('#popup-content').html(tableContent);
+                    // popup.addContentToBody(popupId, '', tableContent)
+                    popup.body().insert(tableContent);
                        
                     let objBalance = Symbols3.analitica(objAnalitica, (order)=>{
                         tableto.addRow('tableOrders', order);
@@ -708,11 +769,16 @@
 
 
 
-                    $('#popup-header').find('div[name="symbol"]>span').html(symbol);
+                    // $('#popup-header').find('div[name="symbol"]>span').html(symbol);
+                    popup.header().insert(symbol, 'h1');
                     for(let prop in objBalance){
                         //$('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop].toFixed(5)); 
                         //console.log(prop, objBalance[prop], typeof objBalance[prop])
-                        $('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop]);
+                        //$('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop]);
+                        //popup.addContentToHeader(popupId, 'div[name="'+prop+'"]>span', objBalance[prop]);
+                        console.log(prop, objBalance[prop]);
+                        popup.header().insert(objBalance[prop], 'div[name="'+prop+'"]>span');
+
                     }
 
                     tableto.colorizeRows({
@@ -726,100 +792,9 @@
                         }
                     });
                     tableto.sort('tableOrders', 'time');
-
-
 
                 //});
                 return
-
-                common.sendAjax(obj).then(function(responseOrders){
-                    //console.log(responseOrders);
-                    let orders = responseOrders['data'];
-                    objAnalitica['orders'] = orders;
-                    //console.log(orders);
-                    const structure = {
-                        cb :{
-                            name : 'cb',
-                            type : 'checkbox'
-                        },
-                        nr : 
-                        {
-                            name : 'nr',
-                            type : 'increment',
-                            count : 0
-                        },
-                        id :
-                        {
-                            name : 'id',
-                            type : 'text',
-                            trId : true
-                        },
-                        time : {
-                            name : 'time',
-                            type : 'datetime',
-                            sortable : true,
-                        },
-                        symbol :
-                        {
-                            name : 'symbol',
-                            type : 'text',
-                        },
-                        qty : {
-                            name : 'qty',
-                            type : 'text',
-                        },
-                        price : {
-                            name : 'price',
-                            type : 'text',
-                        },
-                        commission : {
-                            name : 'commission',
-                            type : 'text',
-                        },
-                        commissionAsset : {
-                            name : 'commissionAsset',
-                            type : 'text',
-                        },
-                        quoteQty : {
-                            name : 'quoteQty',
-                            type : 'text',
-                        },
-                        isBuyer : {
-                            name : 'isBuyer',
-                            type : 'text',
-                        },
-                    }
-    
-                    let tableContent = tableto.createTable('tableOrders', structure);
-                    $('#popup-content').html(tableContent);
-                       
-                    let objBalance = Symbols3.analitica(objAnalitica, (order)=>{
-                        tableto.addRow('tableOrders', order);
-                        //console.log(order);
-                    });
-
-
-
-                    $('#popup-header').find('div[name="symbol"]>span').html(symbol);
-                    for(let prop in objBalance){
-                        //$('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop].toFixed(5)); 
-                        //console.log(prop, objBalance[prop], typeof objBalance[prop])
-                        $('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop]);
-                    }
-
-                    tableto.colorizeRows({
-                        tableId : 'tableOrders',
-                        field : {
-                            name : 'isBuyer',
-                            conditions : {
-                                 'true': 'w3-pale-green',
-                                 'false': 'w3-pale-red'
-                            }
-                        }
-                    });
-                    tableto.sort('tableOrders', 'time');
-                    
-                });
             }
 
     }
@@ -828,21 +803,18 @@
 
     function analitica(objAnalitica, cb = null){
         //console.log(objAnalitica)
-        if(cb){
-            //console.log('cb function is not null');
-        }else{
-            //console.log('cb function is null')
-        }
         //let symbol = objAnalitica.symbol;
         let price = Number(objAnalitica.price);
         let available = Number(objAnalitica.available);
         let onOrder = Number(objAnalitica.onOrder);
+        let onLD = Number(objAnalitica.onLD);
         let orders = objAnalitica.orders;
         let objBalance = {
             //balance : 0,
             //symbol : symbol,
             available : available,
             onOrder : onOrder,
+            onLD : onLD, 
             buyed : 0,
             sold :0,
             usdtAmountBuy : 0,
@@ -881,7 +853,7 @@
 
         objBalance.averageBuyerPrice = sumBuyedQuote / buyed;
 
-        objBalance.amount = (available + onOrder) * price;
+        objBalance.amount = (available + onOrder + onLD) * price;
 
         objBalance.averageSellerPrice = (sumSoldQuote > 0) ? (sumSoldQuote / sold) : 0;
         objBalance.tradeBalance = buyed - sold;
@@ -924,10 +896,8 @@
         let tableId = tableto.tableId;
         //let symbol = rowId = tableto.getRowIdByTdElement(el);
         let arrRowIds = tableto.getRowIdsArrayFromTable('tableBalance')
-        //console.log(arrRowIds)
-        arrRowIds.forEach( symbol => {
-            //console.log(rowId)
 
+        arrRowIds.forEach( symbol => {
 
             stablecoins.forEach((stablecoin) => {
                 let pair = symbol+stablecoin;
@@ -1023,7 +993,6 @@
 
     Symbols3.getOrdersByPair = getOrdersByPair;
     Symbols3.getOpenOrdersByPair = getOpenOrdersByPair;
-
 
     Symbols3.showSymbolInfo = showSymbolInfo;
     Symbols3.showMarket = showMarket;

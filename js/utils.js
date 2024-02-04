@@ -52,7 +52,47 @@ function getExchangeInfo(){
         }).catch( err => console.error(err));
 }
 
+
+async function getOrdersForAllOwnedAssets(){
+    let objBalances = await Symbols3.getBalances();
+    const actual = objBalances.actual.data;
+    const previous = objBalances.previous.data;
+    // console.log('actual', actual)
+    // console.log('previous', previous);
+    assets = new Set()
+    for(assetName in actual){
+        // console.log(asset, actual[assetName]);
+        if(parseFloat(actual[assetName].available) > 0 || parseFloat(actual[assetName].onOrder) > 0){
+            assets.add(assetName)        
+        }
+    }
+
+    for(assetName in previous){
+        // console.log(asset, previous[assetName]);
+        if(parseFloat(previous[assetName].available) > 0 || parseFloat(previous[assetName].onOrder) > 0){
+            assets.add(assetName)        
+        }
+    }
+
+    assets = [...assets]
+    // assetName = 'BTC'
+    assets.forEach((assetName) => {
+        const promisesOrders = [];
+        stablecoins.forEach((stablecoin)=>{
+            let pair = assetName+stablecoin;
+            promisesOrders.push(orders.retrieveOrdersFromBinanceForPair(pair))
+        });
+
+        arrOrders = []
+        Promise.all(promisesOrders).then((responseOrders) => {
+            arrOrders.push(responseOrders)
+        })
+        console.log('arrOrders', arrOrders)
+    })
+}
+
 utils.show = show;
 utils.createExchangePairs = createExchangePairs;
+utils.getOrdersForAllOwnedAssets = getOrdersForAllOwnedAssets;
 window.utils = utils;
 })();

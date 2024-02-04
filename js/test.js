@@ -183,12 +183,35 @@ function closeSocket(){
 }
 
 
+
+
+async function testPopup(){
+    const popup = new Popup2();
+    let htmlPopup = await template.loadRawTemplateFromFile('ordersBySymbol.html');
+    popup.show();
+    popup.header().insert(htmlPopup);
+    popup.header().after('text After');
+    popup.header().before('text Before');
+    popup.body().insert(htmlPopup);
+    //popup.header().insert().html(htmlPopup);
+    //popup.body().insert().html('Это боди!');
+    //popup.body().insert().html('Это боди22222!');
+
+/*
+    const popup2 = new Popup2();
+    let htmlPopup2 = await template.loadRawTemplateFromFile('operations.html');
+    popup2.show();
+    popup2.header().insert().html(htmlPopup2);
+*/   
+}
+
 test.test = test;
 test.show = show;
 test.getWithdrawHistory = getWithdrawHistory;
 test.getDepositHistory = getDepositHistory;
 test.getSocket = getSocket;
 test.closeSocket = closeSocket;
+test.testPopup = testPopup;
 window.test = test;
 
 })();

@@ -44,8 +44,27 @@ function getOrders(){
     });
 }
 
+function retrieveOrdersFromBinanceForPair(pair){
+    const objRequest = {
+        controller : 'Symbols3',
+        action : 'retrieveOrdersFromBinanceForPair',
+        pair : pair
+    }
+
+    return common.sendAjax(objRequest).then( response => {
+        console.log('retrieveOrdersFromBinanceForPair', response);
+        if(response.success){
+            return response.data;
+        }else{
+            console.log(response.error);
+            return false;
+        }
+    });
+}
+
 
 orders.getOrdersBySymbol = getOrdersBySymbol;
 orders.getOrders = getOrders;
+orders.retrieveOrdersFromBinanceForPair = retrieveOrdersFromBinanceForPair;
 window.orders = orders;
 })();

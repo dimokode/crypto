@@ -16,3 +16,7 @@ th.asc::after {
 th.desc::after {
     content : '\25BC';
 }
+
+td.clickable {
+    cursor: pointer;
+}

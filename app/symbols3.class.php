@@ -74,6 +74,7 @@ class Symbols3 {
         }
         return $ans;
     }
+    
 
     static public function getBalance($filename){
         $path_to_folder = PATH_TO_LOGS."/balances/";
@@ -270,31 +271,37 @@ class Symbols3 {
         $params = json_decode($params, true);
         $pair = $params['pair'];
         $ans['success'] = false;
+        $ans['pair'] = $pair;
         
-        try{
+        try {
             $data = Binance::getOrdersByPair($pair);
-        }catch(Exception $e){
+   
+            wrlog($pair, 'aaa.txt');
+            wrlog($data, 'aaa.txt');
+            $path_to_folder = PATH_TO_LOGS."/orders/";
+            $path_to_file = $path_to_folder.$pair.".txt";
+
+            if($data){
+                $ans = array_merge( $ans, fs::saveContentToFile($path_to_file, json_encode($data)) );
+                wrlog("if data", 'aaa.txt');
+                // if($ans['success']){
+                    // $ans['success'] = true;
+                    // $ans = fs::getJSONFromFile($path_to_folder, $pair.".txt");
+                // }
+            }
+            else{
+                // $ans['success'] = false;
+                $ans['error'] = "no data for the pair $pair";
+            }
+
+        } catch(Exception $e){
             //arrlog($e, 'aaa.txt');
             //wrlog($e->getMessage(), 'bbb.txt');
             $data = false;
             $ans['error'] = $e->getMessage();
         }
-        
-        //arrlog($data, 'aaa.txt');
-        //wrlog('aaa', 'aaa.txt');
-        $path_to_folder = PATH_TO_LOGS."/orders/";
-        $path_to_file = $path_to_folder.$pair.".txt";
-        if($data){
-            $ans = fs::saveContentToFile($path_to_file, json_encode($data));
-            if($ans['success']){
-                $ans = fs::getJSONFromFile($path_to_folder, $pair.".txt");
-            }
-        }else{
-            $ans['success'] = false;
-            //$ans['error'] = 'Error retrieveOrdersFromBinanceForPair:';
-        }
 
-        $ans['pair'] = $pair;
+        wrlog($ans, 'aaa.txt');
         return $ans;     
     }
 

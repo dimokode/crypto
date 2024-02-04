@@ -13,6 +13,8 @@ class popup{
 `
 <button class="w3-button" style="float:right;" onclick="popup.hide('${popupId}');">X</button>
 <popup-content></popup-content>
+<popup-header></popup-header>
+<popup-body></popup-body>
 `
         let popup = document.createElement('popup');
         popup.id = popupId;
@@ -40,7 +42,7 @@ class popup{
 
 
     static addContent(popupId, html, insertTag = undefined){
-        console.log(typeof html);
+        //console.log(typeof html);
         //return
         if(insertTag == undefined){
             if(typeof html == 'string'){
@@ -52,6 +54,54 @@ class popup{
             if(typeof html == 'string'){
                 document.querySelector(`popup#${popupId}>popup-content>${insertTag}`).innerHTML = html;
             }
+        }
+    }
+
+    /*
+    static addContentBySelector(popupId, html, selector){
+        document.querySelector(`popup#${popupId}>popup-content ${selector}`).innerHTML = html;
+    }
+    */
+
+
+
+
+    static addContentToHeader(popupId, selector, html){
+        try{
+            const el = document.querySelector(`popup#${popupId} #popup-header ${selector}`);
+            if(el){
+                //el.innerHTML = html;
+                el.insertAdjacentHTML('beforeend', html);
+            }else{
+                console.warn("selector doesn't exist", selector);
+            }
+            
+        }catch(e){
+            console.log(e);
+            console.log('selector', selector);
+        }
+    }
+
+
+
+    static addContentToBody(popupId, selector = '', html){
+        try{
+            const el = document.querySelector(`popup#${popupId} #popup-body ${selector}`);
+            if(el){
+                //el.innerHTML = html;
+                if(typeof html == 'string'){
+                    el.insertAdjacentHTML('beforeend', html);
+                }else if(typeof html == 'object'){
+                    el.append(html);
+                }
+                
+            }else{
+                console.warn("selector doesn't exist", selector);
+            }
+            
+        }catch(e){
+            console.log(e);
+            console.log('selector', selector);
         }
     }
 
@@ -73,5 +123,7 @@ class popup{
         let popupContentElement = popupElement.querySelector('popup-content');
         template.changeTagContent(popupContentElement, tagname, value);
     }
+
+
 
 }
