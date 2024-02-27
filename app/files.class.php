@@ -105,10 +105,10 @@ class files{
 			//return false;
 			$result = false;
 		}
-  	$ans['result'] = $result;
-  	$ans['folders'] = $arrFolders;
-  	return $ans;
-  }
+		$ans['result'] = $result;
+		$ans['folders'] = $arrFolders;
+		return $ans;
+	}
 
 public function loadConfigDataFile($params){
 	$params = json_decode($params, true);

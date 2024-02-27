@@ -313,14 +313,19 @@
 
 
 
-    function btnUpdateOrdersForPair(el){
+    async function btnUpdateOrdersForPair(el){
         console.log('btnUpdateOrdersForPair');
+
         let tableId = tableto.getTableIdByTdElement(el);
         let symbol = rowId = tableto.getRowIdByTdElement(el);
-        //const pair = symbol + 'USDT';
+
+        // let data = await getExchangePairsBySymbol(symbol);
+        // console.log(data);
+
+        let pair;
         const promisesOrders = []
         stablecoins.forEach((stablecoin) => {
-            let pair = symbol+stablecoin;
+            pair = symbol+stablecoin;
             promisesOrders.push( updateOrdersForPair(tableId, rowId, pair) );
         });
         console.log('promisesOrders', promisesOrders);
@@ -330,9 +335,10 @@
         }).catch( error => {
             console.log('error', error);
         }).finally(() => {
+            updateOrdersForPair(tableId, rowId, pair);
             console.log('finally');
-        })
-        //updateOrdersForPair(tableId, rowId, pair);
+        });
+        
 
     }
 
@@ -751,10 +757,19 @@
                             name : 'quoteQty',
                             type : 'text',
                         },
+                        actualAmount : {
+                            name : 'actualAmount',
+                            type : 'text',
+                        },
+                        difAmount : {
+                            name : 'difAmount',
+                            type : 'text',
+                        },
                         isBuyer : {
                             name : 'isBuyer',
                             type : 'text',
                         },
+
                     }
     
                     let tableContent = tableto.createTable('tableOrders', structure);
@@ -764,12 +779,15 @@
                        
                     let objBalance = Symbols3.analitica(objAnalitica, (order)=>{
                         tableto.addRow('tableOrders', order);
-                        //console.log(order);
+                        console.log(order);
                     });
+
+                    console.log('objBalance', objBalance);
 
 
 
                     // $('#popup-header').find('div[name="symbol"]>span').html(symbol);
+                    // Заполнение верхней шапки
                     popup.header().insert(symbol, 'h1');
                     for(let prop in objBalance){
                         //$('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop].toFixed(5)); 
@@ -835,6 +853,10 @@
         //let quoteQty = 0; //amount in USDT
         for(let item in orders){
             let order = orders[item];
+            // if the trade operation was carried out at the actual price
+            order['actualAmount'] = price * order['qty'];
+            //difference between trade amount at the current price and the price at the moment of deal
+            order['difAmount'] = (price * order['qty']) - order['quoteQty'];
             //console.log(order);
             if(cb){
                 cb(order)

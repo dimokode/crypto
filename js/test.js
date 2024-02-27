@@ -205,6 +205,18 @@ async function testPopup(){
 */   
 }
 
+
+async function links(){
+    const popup = new Popup2();
+    let htmlPopup = await template.loadRawTemplateFromFile('links.html');
+    popup.show();
+    // popup.header().insert(htmlPopup);
+    // popup.header().after('text After');
+    // popup.header().before('text Before');
+    popup.body().insert(htmlPopup);
+}
+
+
 test.test = test;
 test.show = show;
 test.getWithdrawHistory = getWithdrawHistory;
@@ -212,6 +224,7 @@ test.getDepositHistory = getDepositHistory;
 test.getSocket = getSocket;
 test.closeSocket = closeSocket;
 test.testPopup = testPopup;
+test.links = links;
 window.test = test;
 
 })();
