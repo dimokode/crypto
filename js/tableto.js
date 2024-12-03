@@ -638,6 +638,7 @@ function colorizeRow(tableId, rowId){
 }
 
 function updateRow(tableId, rowId, rowData){
+    // WARNING! Replace table cells content by rowId
     let tableElement = document.querySelector('#'+tableId)
     let rowElement  =tableElement.querySelector('tr[name="'+rowId+'"]')
     for(let colId in rowData){

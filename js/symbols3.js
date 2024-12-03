@@ -32,10 +32,11 @@
         const [arrAssets, LD_assets] = await assets.getAssets(dataBalancesHistory_raw);
         console.log('arrAssets', arrAssets);
         console.log('LD_assets', LD_assets);
-
-        dataBalancesHistory = Symbols3.filterBalances2(dataBalancesHistory_raw, arrAssets);
-        console.log('dataBalancesHistory', dataBalancesHistory);
         
+
+        dataBalancesHistory = filterBalances2(dataBalancesHistory_raw, arrAssets, LD_assets);
+        console.log('dataBalancesHistory', dataBalancesHistory);
+
         let dataPrices = await getPrices();
         console.log('dataPrices', dataPrices);
 
@@ -46,14 +47,15 @@
             dataFiat = preparedBalances['dataFiat'];
 
         // add earn assets (LD)
-        for(let asset in dataBalances){
-            dataBalances[asset]['onLD'] = {}
-            dataBalances[asset]['onLD']['actual'] = LD_assets[asset] ? Number(LD_assets[asset]) : 0
-        }
+        // for(let asset in dataBalances){
+        //     dataBalances[asset]['onLD'] = {}
+        //     dataBalances[asset]['onLD']['actual'] = LD_assets[asset] ? Number(LD_assets[asset]) : 0
+        // }
         
 
         console.log('dataBalances', dataBalances);
         console.log('dataFiat', dataFiat);
+
 
         for(let assetId in dataBalances){
             //console.log(assetId+'USDT', dataPrices[assetId+'USDT'])
@@ -102,24 +104,29 @@
         for(let asset in dataBalancesHistory['actual']['data']){
 
             let dataAsset = {
-                'available' : {},
-                'onOrder' : {}
+                'available': {},
+                'onOrder': {},
+                'onLD': {}
             }
 
             dataAsset['available']['actual'] = dataBalancesHistory['actual']['data'][asset]['available'];
             dataAsset['onOrder']['actual'] = dataBalancesHistory['actual']['data'][asset]['onOrder'];
+            dataAsset['onLD']['actual'] = dataBalancesHistory['actual']['data'][asset]['onLD'];
 
             if(dataBalancesHistory['previous'] !== undefined){
                 if(dataBalancesHistory['previous']['data'][asset] !== undefined){
                     dataAsset['available']['previous'] = dataBalancesHistory['previous']['data'][asset]['available'];
                     dataAsset['onOrder']['previous'] = dataBalancesHistory['previous']['data'][asset]['onOrder'];
+                    dataAsset['onLD']['previous'] = dataBalancesHistory['previous']['data'][asset]['onLD'] ? dataBalancesHistory['previous']['data'][asset]['onLD'] : 0;
                 }else{
                     dataAsset['available']['previous'] = "0";
                     dataAsset['onOrder']['previous'] = "0";
+                    dataAsset['onLD']['previous'] = "0";
                 }
             }else{
                 dataAsset['available']['previous'] = "0";
                 dataAsset['onOrder']['previous'] = "0";
+                dataAsset['onLD']['previous'] = "0";
             }
             dataBalance[asset] = dataAsset;
         }
@@ -518,9 +525,8 @@
     */
 
     function priceToShow(price){
-        //console.log(price)
         price = Number(price);
-        let digitsAfterPoint = detectDigitsAfterPoint(Math.abs(price))
+        const digitsAfterPoint = detectDigitsAfterPoint(Math.abs(price))
         return price.toFixed(digitsAfterPoint);
     }
 
@@ -558,32 +564,43 @@
 
 
     async function calculateRow(tableId, rowId){
-        //console.log('tableId', tableId)
         tableto.setTableId(tableId);
+        
         let price = tableto.td(tableId, rowId, 'price').getData('actual');
-        //console.log('price', price)
         let pricePrevious = Number(tableto.td(tableId, rowId, 'price').getData('previous'));
-        //console.log('pricePrevious', pricePrevious)
         let priceDifAbs = valueDif(price, pricePrevious);
-
         let priceDifRel = calculatePriceRelativeDifference(priceDifAbs, pricePrevious);
-
-        //console.log('priceDifRel', priceDifRel)
         let htmlpriceDifRel = tableto.colorizeNumber(priceToShow(priceDifRel)) + '%';
         tableto.td(tableId, rowId, 'price').setData('value', priceDifRel);
 
         let available = tableto.td(tableId, rowId, 'available').getData('actual')
-        let onOrder = tableto.td(tableId, rowId, 'onOrder').getData('actual')
-        let onLD = tableto.td(tableId, rowId, 'onLD').getData('actual')
+        let availablePrevious = Number(tableto.td(tableId, rowId, 'available').getData('previous'));
+        let availableDifAbs = valueDif(available, availablePrevious);
+        tableto.td(tableId, rowId, 'available').setData('value', availableDifAbs);
+
+        let onOrder = tableto.td(tableId, rowId, 'onOrder').getData('actual');
+        let onOrderPrevious = Number(tableto.td(tableId, rowId, 'onOrder').getData('previous'));
+        let onOrderDifAbs = valueDif(onOrder, onOrderPrevious);
+        tableto.td(tableId, rowId, 'onOrder').setData('value', onOrderDifAbs);
+
+        let onLD = tableto.td(tableId, rowId, 'onLD').getData('actual');
+        let onLDPrevious = Number(tableto.td(tableId, rowId, 'onLD').getData('previous'));
+        let onLDDifAbs = valueDif(onLD, onLDPrevious);
+        tableto.td(tableId, rowId, 'onLD').setData('value', onLDDifAbs);
+
 
         tableto.td(tableId, rowId, 'onOrder').setData('value', onOrder);
 
         //tableto.setTdContent(rowId, 'price', priceToShow(price)+'<br>'+ `<span class="w3-text-grey">`+priceToShow(pricePrevious)+`</span>`)
         tableto.setTdContent(rowId, 'price', priceToShow(price)+` (${htmlpriceDifRel})`+'<br>' + tableto.colorizeNumber(priceDifAbs) +'<br>'+`<span class="w3-text-grey">`+priceToShow(pricePrevious)+`</span>`)
         //tableto.setTdContent(rowId, 'price', price+'<br>'+`<span class="w3-text-grey">`+priceToShow(price)+`</span>`)
-        tableto.setTdContent(rowId, 'available', available)
-        tableto.setTdContent(rowId, 'onOrder', onOrder)
-        //console.log(tableto.td(tableId, rowId, 'price').getData('actual'));
+        // tableto.setTdContent(rowId, 'available', available)
+        tableto.setTdContent(rowId, 'available', priceToShow(available) + '<br>' + tableto.colorizeNumber(priceToShow(availableDifAbs)) + '<br>' + `<span class="w3-text-grey">`+ priceToShow(availablePrevious) +`</span>`);
+
+        // tableto.setTdContent(rowId, 'onOrder', onOrder)
+        tableto.setTdContent(rowId, 'onOrder', priceToShow(onOrder) + '<br>' + tableto.colorizeNumber(priceToShow(onOrderDifAbs)) + '<br>' + `<span class="w3-text-grey">`+ priceToShow(onOrderPrevious) + `</span>`)
+
+        tableto.setTdContent(rowId, 'onLD', priceToShow(onLD) + '<br>' + tableto.colorizeNumber(priceToShow(onLDDifAbs)) + '<br>' + `<span class="w3-text-grey">`+ priceToShow(onLDPrevious) + `</span>`);
 
 
         let objAnalitica = {
@@ -595,7 +612,12 @@
             orders : await orders.getOrdersBySymbol(rowId)
         }
 
-        rowData = Symbols3.analitica(objAnalitica)
+        rowData = analitica(objAnalitica)
+        delete rowData['available'];
+        delete rowData['onOrder'];
+        delete rowData['onLD'];
+
+        // console.log(rowData)
         tableto.updateRow(tableId, rowId, rowData)
 
         const objTableStyle = {
@@ -645,7 +667,7 @@
     }
 
 
-    function filterBalances2(objBalances, arrAssets){
+    function filterBalances2(objBalances, arrAssets, LD_assets){
         console.log('objBalances', objBalances)
         console.log('arrAssets', arrAssets)
         const actual = objBalances.actual.data;
@@ -667,6 +689,11 @@
             // console.log(actual);
             if(arrAssets.includes(asset)){
                 filteredActual[asset] = actual[asset];
+                if(actual['LD'+asset]){
+                    filteredActual[asset]['onLD'] = actual['LD'+asset]['available'];
+                }else{
+                    filteredActual[asset]['onLD'] = 0;
+                }
             }
         }
         console.log('filteredActual', filteredActual)
@@ -676,6 +703,11 @@
             //console.log(asset);
             if(arrAssets.includes(asset)){
                 filteredPrevious[asset] = previous[asset];
+                if(previous['LD'+asset]){
+                    filteredPrevious[asset]['onLD'] = previous['LD'+asset]['available'];
+                }else{
+                    filteredPrevious[asset]['onLD'] = 0;
+                }
             }
         }
         console.log('filteredPrevious', filteredPrevious)
