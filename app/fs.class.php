@@ -133,9 +133,13 @@ class fs {
 		return $ans;
     }
 
+    static public function mkdir($path_to_folder){
+        $result = mkdir($path_to_folder, 0777, true);
+    }
+
     static function createFolder($path_to_folder){
         try{
-            $result = mkdir($path_to_folder);
+            $result = mkdir($path_to_folder, 0777, true);
             if($result){
                 $ans['success'] = true;
             }
@@ -219,23 +223,31 @@ class fs {
                 }
                 //wrlog($ans['data']);
             }else{
-                $ans['error'] = "Error by getting content from file $filename";
+                throw new Exception("Error by getting content from file $filename");
+                // $ans['error'] = "Error by getting content from file $filename";
             }
         }else{
-            $ans['error'] = "Data file $filename doesn't exist";
+            throw new Exception("Data file $filename doesn't exist");
+            // $ans['error'] = "Data file $filename doesn't exist";
         }
         return $ans;
     }
 
-    static function saveJSONToFile($path_to_folder, $filename, $jsonData){
-        $ans['success'] = false;
-        $path_to_file = $path_to_folder.$filename;
-        if(file_put_contents($path_to_file, $jsonData)){
-            $ans['success'] = true;
-        }else{
-            $ans['error'] = "Error by saving content to file $filename";
+    static public function backupFile($path_to_source_folder, $filename, $path_to_backup_folder=NULL){
+        if(!isset($path_to_backup_folder)){
+            $path_to_backup_folder = $path_to_source_folder;
         }
-        return $ans;
+        $filename_backup = time()."_".$filename;
+        
+        return copy($path_to_source_folder.$filename, $path_to_backup_folder.$filename_backup);
+    }
+
+    static function saveJSONToFile($path_to_folder, $filename, $jsonData){
+        $path_to_file = $path_to_folder.$filename;
+        if(!@file_put_contents($path_to_file, $jsonData)){
+            throw new Exception("Error by saving the file");
+        }
+        return true;
     }
 
 

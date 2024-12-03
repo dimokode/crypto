@@ -171,8 +171,14 @@ class Symbols3 {
     static public function getOrdersByPair($params){
         $params = json_decode($params, true);
         $pair = $params['pair'];
+        $ans['success'] = false;
 
-        $ans = fs::getJSONFromFile(PATH_TO_LOGS."/orders/", $pair.".txt");
+        try{
+            $ans['data'] = fs::getJSONFromFile(PATH_TO_LOGS."/orders/", $pair.".txt")['data'];
+            $ans['success'] = true;
+        }catch(Exception $e){
+            $ans['error'] = $e->getMessage();
+        }
         
         return $ans;
     }
@@ -305,44 +311,129 @@ class Symbols3 {
         return $ans;     
     }
 
+    static public function saveOrdersForPair($params){
+        $ans['success'] = false;
 
-    static public function retrieveOpenOrdersFromBinanceForPair($params){
         $params = json_decode($params, true);
         $pair = $params['pair'];
-        if(!$pair){
-            return [
-                'success' => false,
-                'error' => "Symbol is missing"
-            ];
-        }
-        $ans['success'] = false;
-        
+        $data = $params['data'];
+
+        $path_to_folder = PATH_TO_LOGS."/orders/";
+        $path_to_file = $path_to_folder.$pair.".txt";
+        $filename = $pair.".txt";
+
         try{
-            $data = Binance::getOpenOrdersByPair($pair);
-        }catch(Exception $e){
-            //arrlog($e, 'aaa.txt');
-            //wrlog($e->getMessage(), 'bbb.txt');
-            $data = false;
+            fs::saveJSONToFile($path_to_folder, $filename, json_encode($data));
+            $ans['success'] = true;
+
+        }catch(Throwable $e){
             $ans['error'] = $e->getMessage();
         }
-        
-        //arrlog($data, 'aaa.txt');
-        //wrlog('aaa', 'aaa.txt');
-        $path_to_folder = PATH_TO_LOGS."/openOrders/";
-        $path_to_file = $path_to_folder.$pair.".txt";
-        if($data){
-            $ans = fs::saveContentToFile($path_to_file, json_encode($data));
-            if($ans['success']){
-                $ans = fs::getJSONFromFile($path_to_folder, $pair.".txt");
-            }
-        }else{
-            //$ans['success'] = false;
-            //$ans['error'] = 'Error retrieveOrdersFromBinanceForPair';
+
+        return $ans;
+    }
+
+    static public function backupFile($params){
+        $params = json_decode($params, true);
+        $pair = $params['pair'];
+        $ans['success'] = false;
+        $ans['pair'] = $pair;
+
+        $path_to_source_folder = PATH_TO_LOGS."/orders/";
+        $path_to_backup_folder = PATH_TO_LOGS."/orders/backup/";
+
+        if(!file_exists($path_to_backup_folder)){
+            fs::mkdir($path_to_backup_folder);
+        }
+        $filename = $pair.".txt";
+
+        $result = fs::backupFile($path_to_source_folder, $filename, $path_to_backup_folder);
+        $ans['success'] = $result;
+
+        return $ans;
+    }
+
+    static public function retrieveOrdersForPair($params){
+        $params = json_decode($params, true);
+        $pair = $params['pair'];
+        $ans['success'] = false;
+        $ans['pair'] = $pair;
+
+        $path_to_folder = PATH_TO_LOGS."/orders/";
+        $filename = $pair.".txt";
+
+        try{
+            $data = fs::getJSONFromFile($path_to_folder, $filename)['data'];
+            $ans['data'] = $data;
+            $ans['success'] = true;
+
+        }catch(Exception $e){
+            $ans['error'] = $e->getMessage();
         }
 
-        $ans['pair'] = $pair;
-        return $ans;     
+        return $ans;
     }
+
+    static public function getLastOrdersForPair($params){
+        $params = json_decode($params, true);
+        $pair = $params['pair'];
+        $ans['success'] = false;
+        $ans['pair'] = $pair;
+
+        $path_to_folder = PATH_TO_LOGS."/orders/";
+        $filename = $pair.".txt";
+
+        try{
+            $data = Binance::getOrdersByPair($pair);
+            // $data = fs::getJSONFromFile($path_to_folder, $filename)['data'];
+            $ans['data'] = $data;
+            $ans['success'] = true;
+
+        }catch(Exception $e){
+            $ans['error'] = $e->getMessage();
+        }
+
+        return $ans;
+    }
+
+
+    // static public function retrieveOpenOrdersFromBinanceForPair($params){
+    //     $params = json_decode($params, true);
+    //     $pair = $params['pair'];
+    //     if(!$pair){
+    //         return [
+    //             'success' => false,
+    //             'error' => "Symbol is missing"
+    //         ];
+    //     }
+    //     $ans['success'] = false;
+        
+    //     try{
+    //         $data = Binance::getOpenOrdersByPair($pair);
+    //     }catch(Exception $e){
+    //         //arrlog($e, 'aaa.txt');
+    //         //wrlog($e->getMessage(), 'bbb.txt');
+    //         $data = false;
+    //         $ans['error'] = $e->getMessage();
+    //     }
+        
+    //     //arrlog($data, 'aaa.txt');
+    //     //wrlog('aaa', 'aaa.txt');
+    //     $path_to_folder = PATH_TO_LOGS."/openOrders/";
+    //     $path_to_file = $path_to_folder.$pair.".txt";
+    //     if($data){
+    //         $ans = fs::saveContentToFile($path_to_file, json_encode($data));
+    //         if($ans['success']){
+    //             $ans = fs::getJSONFromFile($path_to_folder, $pair.".txt");
+    //         }
+    //     }else{
+    //         //$ans['success'] = false;
+    //         //$ans['error'] = 'Error retrieveOrdersFromBinanceForPair';
+    //     }
+
+    //     $ans['pair'] = $pair;
+    //     return $ans;     
+    // }
 
 
     static public function retrieveWithdrawHistoryFromBinance($params){

@@ -14,10 +14,14 @@ if(isset($_COOKIE['logged']) && $_COOKIE['logged'] == true){
 }else{
   Template::loadTplFromFile('login-page.html');
 	$html_content = Template::generate();
-	//$html_content = 'Hello World!';
 }
+
 Template::loadTplFromFile('common.html');
 Template::assign('content', $html_content);
-echo Template::generate();
+
+$fp = fopen('php://output', 'w');
+fwrite($fp, Template::generate());
+fclose($fp);
+// echo Template::generate();
 
 ?>

@@ -15,6 +15,7 @@ define("ROOT_DIR", dirname (__FILE__));
 define("TPL_DIR", ROOT_DIR.'/tpl');
 define("APP_DIR", ROOT_DIR.'/app');
 define("PATH_TO_LOGS", ROOT_DIR.'/logs');
+define("PATH_TO_FAKEDATA", ROOT_DIR.'/fakedata');
 define("PATH_TO_DB", ROOT_DIR.'/db/');
 define("PATH_TO_CONFIG", ROOT_DIR.'/config');
 //define("FORMS_DIR", ROOT_DIR.'/forms');

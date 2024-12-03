@@ -1,4 +1,14 @@
 ;(function(){
+
+    // const capi = new CryptoAPI(new DummyApi());
+    const capi = new CryptoAPI(new BinanceApi());
+    // capi.retrieveOrdersForPair('BTCUSDT').then(response => {
+    //     console.log(response);
+    // });
+
+    // console.log('Apishka', Apishka);
+    // throw new Error;
+
     function Symbols3(){}
 
     async function show() {
@@ -335,7 +345,7 @@
         }).catch( error => {
             console.log('error', error);
         }).finally(() => {
-            updateOrdersForPair(tableId, rowId, pair);
+            // updateOrdersForPair(tableId, rowId, pair);
             console.log('finally');
         });
         
@@ -351,45 +361,49 @@
                 class : 'w3-pale-yellow'
             }
         }
-        // tableto.updateTableStyle(tableId, rowId, objTableStyle)
 
-        return retrieveOrdersFromBinanceForPair(pair).then( objOrders => {
-            if(objOrders){
-                //console.log(objOrders)
-                objTableStyle = {
-                    symbol : {
-                        class : 'w3-pale-green'
-                    }
-                }
-                return true
-            }
-            return false
-            // tableto.updateTableStyle(tableId, rowId, objTableStyle)
-            
-        })
-    }
-
-
-
-
-
-    function retrieveOrdersFromBinanceForPair(pair){
-        const objRequest = {
-            controller : 'Symbols3',
-            action : 'retrieveOrdersFromBinanceForPair',
-            pair : pair
-        }
-
-        return common.sendAjax(objRequest).then( response => {
-            console.log('retrieveOrdersFromBinanceForPair', response);
-            if(response.success){
-                return response.data;
-            }else{
-                console.log(response.error);
-                return false;
-            }
+        return capi.retrieveOrdersForPair(pair).then(response => {
+            // console.log(response);
+            return response;
+        }).catch(error => {
+            console.error(error.message);
         });
+
+        // return retrieveOrdersFromBinanceForPair(pair).then( objOrders => {
+        //     if(objOrders){
+        //         //console.log(objOrders)
+        //         objTableStyle = {
+        //             symbol : {
+        //                 class : 'w3-pale-green'
+        //             }
+        //         }
+        //         return true
+        //     }
+        //     return false
+        // })
     }
+
+
+
+
+
+    // function retrieveOrdersFromBinanceForPair(pair){
+    //     const objRequest = {
+    //         controller : 'Symbols3',
+    //         action : 'retrieveOrdersFromBinanceForPair',
+    //         pair : pair
+    //     }
+
+    //     return common.sendAjax(objRequest).then( response => {
+    //         console.log('retrieveOrdersFromBinanceForPair', response);
+    //         if(response.success){
+    //             return response.data;
+    //         }else{
+    //             console.log(response.error);
+    //             return false;
+    //         }
+    //     });
+    // }
 
 
 
@@ -1020,7 +1034,7 @@
     Symbols3.showMarket = showMarket;
     Symbols3.prepareBalances = prepareBalances;
     Symbols3.getExchangePairsBySymbol = getExchangePairsBySymbol;
-    Symbols3.retrieveOrdersFromBinanceForPair = retrieveOrdersFromBinanceForPair;
+    // Symbols3.retrieveOrdersFromBinanceForPair = retrieveOrdersFromBinanceForPair;
     Symbols3.retrieveOpenOrdersFromBinanceForPair = retrieveOpenOrdersFromBinanceForPair;
     window.Symbols3 = Symbols3;
 })();
