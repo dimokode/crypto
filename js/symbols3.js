@@ -77,7 +77,7 @@
             }
 
             assetObj = Object.assign(assetObj, dataBalances[assetId]);
-            console.log(assetObj)
+            // console.log(assetObj)
             tableto.addRow('tableBalance', assetObj);
             await calculateRow('tableBalance', assetId);
         }
@@ -341,11 +341,15 @@
 
         let pair;
         const promisesOrders = []
-        stablecoins.forEach((stablecoin) => {
-            pair = symbol+stablecoin;
+        
+        const exchangeAssets = Exchange.getExchangePairsForAsset(symbol);
+        console.log(exchangeAssets);
+
+        exchangeAssets.forEach((exchangeAsset) => {
+            pair = symbol+exchangeAsset;
             promisesOrders.push( updateOrdersForPair(tableId, rowId, pair) );
         });
-        console.log('promisesOrders', promisesOrders);
+        // console.log('promisesOrders', promisesOrders);
 
         Promise.all(promisesOrders).then( response => {
             console.log('btnUpdateOrdersForPair', response);
@@ -356,13 +360,13 @@
             console.log('finally');
         });
         
-
     }
 
 
 
 
     function updateOrdersForPair(tableId, rowId, pair){
+        console.log('updateOrdersForPair', pair);
         let objTableStyle = {
             symbol : {
                 class : 'w3-pale-yellow'
@@ -730,7 +734,7 @@
         let onLD = tableto.td(tableId, rowId, 'onLD').getData('actual');
 
         let arrOrders = await orders.getOrdersBySymbol(symbol);
-        //console.log(arrOrders);
+        console.log('arrOrders', arrOrders);
         //return;
 
         let objAnalitica = {

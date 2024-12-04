@@ -159,3 +159,21 @@ function timeToLocal(originalTime) {
   const d = new Date(originalTime * 1000);
   return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(), d.getMilliseconds()) / 1000;
 }
+
+// Array.prototype.removeItemByValue = function(value){
+//     var index = this.indexOf(value);
+//     if (index >= 0) {
+//         this.splice( index, 1 );
+//     }
+//     return this;
+// }
+
+Object.defineProperty(Array.prototype, 'removeItemByValue', {
+    value: function(value) {
+        var index = this.indexOf(value);
+        if (index >= 0) {
+            this.splice( index, 1 );
+        }
+        return this;
+    }
+});

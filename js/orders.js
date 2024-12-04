@@ -5,8 +5,12 @@ function orders(){}
 
 function getOrdersBySymbol(asset){
     const promisesOrders = [];
-    stablecoins.forEach((stablecoin)=>{
-        let pair = asset+stablecoin;
+    const exchangeAssets = Exchange.getExchangePairsForAsset(asset);
+    console.log('exchangeAssets', exchangeAssets);
+
+    exchangeAssets.forEach((exchangeAsset)=>{
+        let pair = asset + exchangeAsset;
+        console.log(pair);
         promisesOrders.push( common.sendAjax({
             controller : 'Symbols3',
             action : 'getOrdersByPair',
@@ -16,13 +20,17 @@ function getOrdersBySymbol(asset){
 
     let arrOrders = [];
     return Promise.all(promisesOrders).then((responseOrders) => {
+
+        // console.log('responseOrders', responseOrders);
+
         responseOrders = responseOrders.filter((item) => {
             return (item.success === true) ? true : false;
         }).map( item => item.data);
+        // console.log('responseOrders', responseOrders);
          
         responseOrders.forEach( (item) => {
             arrOrders = arrOrders.concat(item);
-        })
+        });
 
         return arrOrders;
     });
