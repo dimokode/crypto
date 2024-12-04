@@ -724,24 +724,21 @@
     async function showOrdersByPair(el){
         let tableId = tableto.getTableIdByTdElement(el);
         let symbol = rowId = tableto.getRowIdByTdElement(el);//rename symbol to asset
-        //let price = tableto.getTdContent(tableId, rowId, 'price');
         let price = tableto.td(tableId, rowId, 'price').getData('actual');
-        // let available = tableto.getTdContent(tableId, rowId, 'available');
         let available = tableto.td(tableId, rowId, 'available').getData('actual');
-        // let onOrder = tableto.getTdContent(tableId, rowId, 'onOrder');
         let onOrder = tableto.td(tableId, rowId, 'onOrder').getData('actual');
-        //console.log('price:' + price);
-
+        let onLD = tableto.td(tableId, rowId, 'onLD').getData('actual');
 
         let arrOrders = await orders.getOrdersBySymbol(symbol);
         //console.log(arrOrders);
         //return;
 
         let objAnalitica = {
-            symbol : symbol,
-            price : price,
-            available : available,
-            onOrder : onOrder,
+            symbol,
+            price,
+            available,
+            onOrder,
+            onLD,
             orders : arrOrders
         }
         console.log(objAnalitica)
@@ -826,7 +823,7 @@
                     // popup.addContentToBody(popupId, '', tableContent)
                     popup.body().insert(tableContent);
                        
-                    let objBalance = Symbols3.analitica(objAnalitica, (order)=>{
+                    let objBalance = analitica(objAnalitica, (order)=>{
                         tableto.addRow('tableOrders', order);
                         console.log(order);
                     });
@@ -928,17 +925,19 @@
 
         objBalance.averageSellerPrice = (sumSoldQuote > 0) ? (sumSoldQuote / sold) : 0;
         objBalance.tradeBalance = buyed - sold;
-        //objBalance.available = available;
+
+        let availableAsset = objBalance.available + objBalance.onOrder + objBalance.onLD;
+
         objBalance.buyed = buyed;
         objBalance.sold = sold;
-        objBalance.actualAmount = (objBalance.available + objBalance.onOrder) * price;
+        objBalance.actualAmount = availableAsset * price;
         objBalance.usdtBalance = objBalance.usdtAmountSell - objBalance.usdtAmountBuy;
 
         if(objBalance.usdtBalance > 0) {
             objBalance.averagePrice = objBalance.averageBuyerPrice;
             objBalance.margin = objBalance.actualAmount + objBalance.usdtBalance;
         }else{
-            objBalance.averagePrice = Math.abs(objBalance.usdtBalance) / (objBalance.available + objBalance.onOrder);
+            objBalance.averagePrice = Math.abs(objBalance.usdtBalance) / (availableAsset);
             objBalance.margin = objBalance.actualAmount - Math.abs(objBalance.usdtBalance);
         }
         objBalance.actualBalance = objBalance.amount + objBalance.usdtBalance
