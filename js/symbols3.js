@@ -726,8 +726,10 @@
         let symbol = rowId = tableto.getRowIdByTdElement(el);//rename symbol to asset
         //let price = tableto.getTdContent(tableId, rowId, 'price');
         let price = tableto.td(tableId, rowId, 'price').getData('actual');
-        let available = tableto.getTdContent(tableId, rowId, 'available');
-        let onOrder = tableto.getTdContent(tableId, rowId, 'onOrder');
+        // let available = tableto.getTdContent(tableId, rowId, 'available');
+        let available = tableto.td(tableId, rowId, 'available').getData('actual');
+        // let onOrder = tableto.getTdContent(tableId, rowId, 'onOrder');
+        let onOrder = tableto.td(tableId, rowId, 'onOrder').getData('actual');
         //console.log('price:' + price);
 
 
@@ -742,7 +744,8 @@
             onOrder : onOrder,
             orders : arrOrders
         }
-        //console.log(objAnalitica)
+        console.log(objAnalitica)
+        
         // const popupId = popup.new();
         // popup.show(popupId);
         const popup = new Popup2();
