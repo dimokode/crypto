@@ -10,6 +10,11 @@ class Binance {
         return new Binance\API(API_KEY, SECRET_KEY);
     }
 
+    static public function getServerTime(){
+        $api = self::getApiConnection();
+        return $api->time();
+    }
+
     //Get current account information.
     static public function getAccount(){
         $api = self::getApiConnection();
@@ -79,7 +84,17 @@ class Binance {
         $api = self::getApiConnection();
         $api->useServerTime();
         return $api->depositHistory();
+    }
 
+    static public function getHistoricalDataForSymbol($symbol, $timeframe, $startTime){
+        $api = self::getApiConnection();
+        $api->useServerTime();
+        // return $api->candlesticks($symbol, $timeframe, 1000, 1502928000000);
+        return [
+            'data' => $api->candlesticks($symbol, $timeframe, 1000, $startTime),
+            // 'xMbxUsedWeight' => $api->getXMbxUsedWeight(),
+            // 'getXMbxUsedWeight1m' => $api->getXMbxUsedWeight1m()
+        ];
     }
 
 }

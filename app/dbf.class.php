@@ -371,8 +371,11 @@ static public function saveDataToFile($params){
     $ans['success'] = false;
     try{
         $path_to_folder = PATH_TO_LOGS."/$folder/";
-
         $path_to_file = $path_to_folder.$filename;
+        if(!file_exists($path_to_folder)){
+            mkdir($path_to_folder, 0777, true);
+        }
+
         $ans = fs::saveContentToFile($path_to_file, json_encode($data));
 
     }catch(Exception $e){
@@ -392,10 +395,10 @@ static public function readDataFromFile($params){
 
     $ans['success'] = false;
     try{
-        $path_to_folder = PATH_TO_LOGS."/$folder/";
 
         //$path_to_file = $path_to_folder.$filename;
         //$ans = fs::getContentFromFile($path_to_file);
+        $path_to_folder = PATH_TO_LOGS."/$folder/";
         $ans = fs::getJSONFromFile($path_to_folder, $filename);
 
     }catch(Exception $e){

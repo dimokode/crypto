@@ -24,6 +24,11 @@ function getFilesInFolder(foldername){
 
 
 function saveDataToFile(obj){
+    /*
+    folder: str = /history/xxx
+    filenema: str
+    data: object
+    */
     obj.controller = 'dbf';
     obj.action = 'saveDataToFile';
     return common.sendAjax(obj).then( response => {
@@ -34,6 +39,10 @@ function saveDataToFile(obj){
 
 
 function readDataFromFile(obj){
+    /*
+    folder: str = /history/xxx
+    filenema: str
+    */
     obj.controller = 'dbf';
     obj.action = 'readDataFromFile';
     return common.sendAjax(obj).then( response => {

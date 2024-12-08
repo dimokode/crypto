@@ -2,7 +2,7 @@ composer.phar
 /vendor/
 /alex/
 /fakedata/
-
+/test/
 .DS_Store
 
 .env

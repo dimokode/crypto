@@ -6,11 +6,11 @@ function orders(){}
 function getOrdersBySymbol(asset){
     const promisesOrders = [];
     const exchangeAssets = Exchange.getExchangePairsForAsset(asset);
-    console.log('exchangeAssets', exchangeAssets);
+    // console.log('exchangeAssets', exchangeAssets);
 
     exchangeAssets.forEach((exchangeAsset)=>{
         let pair = asset + exchangeAsset;
-        console.log(pair);
+        // console.log(pair);
         promisesOrders.push( common.sendAjax({
             controller : 'Symbols3',
             action : 'getOrdersByPair',

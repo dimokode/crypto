@@ -90,7 +90,7 @@ function formatDate(timestamp, formatString){
 
 
 function convertTimestampToDatetime(timestamp){
-  var d = new Date(timestamp);
+  var d = new Date(Number(timestamp));
   //var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   let objDate = {
@@ -115,6 +115,8 @@ function convertTimestampToDatetime(timestamp){
   return dFormat;
 
 }
+
+
 
 
 
@@ -175,5 +177,18 @@ Object.defineProperty(Array.prototype, 'removeItemByValue', {
             this.splice( index, 1 );
         }
         return this;
+    }
+});
+
+Object.defineProperty(Array.prototype, 'min', {
+  value: function(){
+    return Math.min.apply(null, this);
+  }
+});
+
+// https://stackoverflow.com/questions/1669190/find-the-min-max-element-of-an-array-in-javascript
+Object.defineProperty(Array.prototype, 'max', {
+    value: function(){
+      return Math.max.apply(null, this);
     }
 });

@@ -37,9 +37,9 @@ class PopupInsertContent{
             
 
             if(el !== null){
-                console.log(el, this.selector);    
+                // console.log(el, this.selector);
                 const htmlType = typeof html;
-                console.log('htmlType', htmlType);
+                // console.log('htmlType', htmlType);
 
                 if(htmlType == 'string' || htmlType == 'number'){
                     switch(this.insertionType){

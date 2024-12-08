@@ -616,7 +616,7 @@
             orders : await orders.getOrdersBySymbol(rowId)
         }
 
-        rowData = analitica(objAnalitica)
+        rowData = await analitica(objAnalitica)
         delete rowData['available'];
         delete rowData['onOrder'];
         delete rowData['onLD'];
@@ -827,7 +827,7 @@
                     // popup.addContentToBody(popupId, '', tableContent)
                     popup.body().insert(tableContent);
                        
-                    let objBalance = analitica(objAnalitica, (order)=>{
+                    let objBalance = await analitica(objAnalitica, symbol, (order)=>{
                         tableto.addRow('tableOrders', order);
                         console.log(order);
                     });
@@ -844,7 +844,7 @@
                         //console.log(prop, objBalance[prop], typeof objBalance[prop])
                         //$('#popup-header').find('div[name="'+prop+'"]>span').html(objBalance[prop]);
                         //popup.addContentToHeader(popupId, 'div[name="'+prop+'"]>span', objBalance[prop]);
-                        console.log(prop, objBalance[prop]);
+                        // console.log(prop, objBalance[prop]);
                         popup.header().insert(objBalance[prop], 'div[name="'+prop+'"]>span');
 
                     }
@@ -869,7 +869,7 @@
 
 
 
-    function analitica(objAnalitica, cb = null){
+    async function analitica(objAnalitica, asset, cb = null){
         //console.log(objAnalitica)
         //let symbol = objAnalitica.symbol;
         let price = Number(objAnalitica.price);
@@ -898,11 +898,18 @@
         };
         //console.log(objBalance);
 
+
         let buyed = 0, sold = 0;
         let sumBuyedQuote = 0, sumSoldQuote = 0;
         //let quoteQty = 0; //amount in USDT
         for(let item in orders){
             let order = orders[item];
+
+            if(order.symbol == asset+'BTC'){
+                order.price = await historical.getPriceForTime('BTCUSDT', order.time) * order.price;
+                console.log('order.price', order.price);
+            }
+            order['quoteQty'] = order['qty'] * order['price'];
             // if the trade operation was carried out at the actual price
             order['actualAmount'] = price * order['qty'];
             //difference between trade amount at the current price and the price at the moment of deal
