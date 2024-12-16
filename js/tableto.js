@@ -724,6 +724,12 @@ function td(tableId, rowId, colId){
         },
         setData(name, value){
             tdElement.dataset[name] = value
+        },
+        setColor(color_class){
+            const current_color = tdElement.getAttribute('color');
+            tdElement.classList.remove(current_color);
+            tdElement.setAttribute('color', color_class);
+            tdElement.classList.add(color_class);
         }
     }
 }
@@ -747,23 +753,22 @@ function getRowIdsArrayFromTable(tableId){
     return arrRowIds;
 }
 
-function updateTableStyle(tableId, rowId, objTableStyle){
-    let tableElement = document.querySelector('#'+tableId)
-    let rowElement  =tableElement.querySelector('tr[name="'+rowId+'"]')
-    for(let tdId in objTableStyle){
-        let tdElement = rowElement.querySelector('td[name="'+tdId+'"]')
-        if(tdElement){
-            for(let attr in objTableStyle[tdId]){
-                if(attr == 'class'){
-                    tdElement.classList.add(objTableStyle[tdId][attr])
-                }else{
-                    tdElement.setAttribute(attr, objTableStyle[tdId][attr])
-                }
-                
-            }
-        }
-    }
-}
+// function updateTableStyle(tableId, rowId, objTableStyle){
+//     let tableElement = document.querySelector('#'+tableId)
+//     let rowElement = tableElement.querySelector('tr[name="'+rowId+'"]')
+//     for(let tdId in objTableStyle){
+//         let tdElement = rowElement.querySelector('td[name="'+tdId+'"]')
+//         if(tdElement){
+//             for(let attr in objTableStyle[tdId]){
+//                 if(attr == 'class'){
+//                     tdElement.classList.add(objTableStyle[tdId][attr])
+//                 }else{
+//                     tdElement.setAttribute(attr, objTableStyle[tdId][attr])
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
@@ -902,7 +907,7 @@ tableto.colorizeRows = colorizeRows;
 tableto.colorizeNumber = colorizeNumber;
 
 tableto.getRowIdsArrayFromTable = getRowIdsArrayFromTable;
-tableto.updateTableStyle = updateTableStyle;
+// tableto.updateTableStyle = updateTableStyle;
 
 tableto.setTdValue = setTdValue;
 tableto.getTdValue = getTdValue;

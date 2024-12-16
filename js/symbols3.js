@@ -242,12 +242,11 @@
 
     function createTable() {
         const structure = {
-            cb :{
+            cb: {
                 name : 'cb',
                 type : 'checkbox'
             },
-            nr : 
-            {
+            nr: {
                 name : 'nr',
                 type : 'increment',
                 count : 0
@@ -258,7 +257,8 @@
                 type : 'text',
                 trId : true,
                 events : {
-                    onclick: 'assets.showAsset(this)'
+                    // onclick: 'assets.showAsset(this)'
+                    onclick: 'assets.changeColor(this)'
                 },
                 class: 'clickable'
             },
@@ -344,6 +344,14 @@
         
         const exchangeAssets = Exchange.getExchangePairsForAsset(symbol);
         console.log(exchangeAssets);
+        
+        // let objTableStyle = {
+        //     symbol : {
+        //         class : 'w3-pale-yellow'
+        //     }
+        // }
+        // tableto.updateTableStyle(tableId, rowId, objTableStyle);
+        tableto.td(tableId, rowId, 'symbol').setColor('w3-pale-yellow');
 
         exchangeAssets.forEach((exchangeAsset) => {
             pair = symbol+exchangeAsset;
@@ -353,6 +361,15 @@
 
         Promise.all(promisesOrders).then( response => {
             console.log('btnUpdateOrdersForPair', response);
+            // objTableStyle = {
+            //     symbol : {
+            //         class : 'w3-pale-green'
+            //     }
+            // }
+            // tableto.updateTableStyle(tableId, rowId, objTableStyle);
+            tableto.td(tableId, rowId, 'symbol').setColor('w3-green');
+
+
         }).catch( error => {
             console.log('error', error);
         }).finally(() => {
@@ -367,11 +384,14 @@
 
     function updateOrdersForPair(tableId, rowId, pair){
         console.log('updateOrdersForPair', pair);
-        let objTableStyle = {
-            symbol : {
-                class : 'w3-pale-yellow'
-            }
-        }
+
+
+        // return new Promise((resolve, reject) => {
+        //     setTimeout(() => {
+        //         resolve(`resolve ${pair}`);
+        //     }, 1000);
+        //     // console.log(prom);
+        // });
 
         return capi.retrieveOrdersForPair(pair).then(response => {
             // console.log(response);
@@ -383,11 +403,11 @@
         // return retrieveOrdersFromBinanceForPair(pair).then( objOrders => {
         //     if(objOrders){
         //         //console.log(objOrders)
-        //         objTableStyle = {
-        //             symbol : {
-        //                 class : 'w3-pale-green'
-        //             }
-        //         }
+                // objTableStyle = {
+                //     symbol : {
+                //         class : 'w3-pale-green'
+                //     }
+                // }
         //         return true
         //     }
         //     return false
@@ -624,12 +644,14 @@
         // console.log(rowData)
         tableto.updateRow(tableId, rowId, rowData)
 
-        const objTableStyle = {
-            symbol : {
-                class : 'w3-green'
-            }
-        }
-        tableto.updateTableStyle(tableId, rowId, objTableStyle)
+        // todo
+        // const objTableStyle = {
+        //     symbol : {
+        //         class : 'w3-green'
+        //     }
+        // }
+        // tableto.updateTableStyle(tableId, rowId, objTableStyle);
+        tableto.td(tableId, rowId, 'symbol').setColor('w3-green');
 
     }
 

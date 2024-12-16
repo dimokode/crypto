@@ -23,63 +23,84 @@ async function show(){
     const html = await template.loadRawTemplateByName('chart.html');
     $('content').html(html);
     const chart = new LWC('#chart');
-    const chart2 = new LWC('#chart2');
+    // const chart2 = new LWC('#chart2');
     const series = chart.addCandlestickSeries();
-    const series2 = chart2.addAreaSeries();
+    series.series.priceScale().applyOptions({
+        scaleMargins: {
+            top: 0, // highest point of the series will be 70% away from the top
+            bottom: 0.2,
+        },
+      });
+    
+    // const series2 = chart2.addAreaSeries();
+    // series2.series.priceScale().applyOptions({
+    //     scaleMargins: {
+    //         top: 0.8, // highest point of the series will be 70% away from the top
+    //         bottom: 0,
+    //     },
+    //   });
 
 
     const seriesVolume = chart.addHistogramSeries({
 		priceFormat: {
 			type: 'volume',
 		},
-		priceLineVisible: false,
+		priceLineVisible: true,
 		color: 'rgba(76, 175, 80, 0.5)',
 		priceScaleId: '',
         LineWidth: 2,
-		scaleMargins: {
-			top: 0.97,
-			bottom: 0,
-		},
-        
-
+		// scaleMargins: {
+		// 	top: 0.9,
+		// 	bottom: 0,
+		// },
     });
+    seriesVolume.series.priceScale().applyOptions({
+        scaleMargins: {
+            top: 0.8, // highest point of the series will be 70% away from the top
+            bottom: 0,
+        },
+      });
+
 
     const data = await bina.convertKlines('BTCUSDT', '1m');
+    console.log(data);
     
     series.setData(data['klines']);
-    series2.setData(data['lines']);
+    // series2.setData(data['lines']);
     seriesVolume.setData(data['volumes']);
+    chart.chart.timeScale().fitContent();
+    // chart2.timeScale().fitContent();
  
 
     //chart.fitContent();
 
 
-    function clickHadlerTakeProfit(param) {
-        const price = series.coordinateToPrice(param.point.y);
-        //console.log(price);
-        let priceLine = series.createPriceLine({
-            price : price,
-            color : 'green',
-            title : `Take (${price})`
-        });
-        console.log(priceLine);
-        chart.updateBtnElement('btnTakeProfit', 'line', priceLine);
-        chart.unsubscribeClick( clickHadlerTakeProfit );
-    }
+    // function clickHadlerTakeProfit(param) {
+    //     const price = series.coordinateToPrice(param.point.y);
+    //     //console.log(price);
+    //     let priceLine = series.createPriceLine({
+    //         price : price,
+    //         color : 'green',
+    //         title : `Take (${price})`
+    //     });
+    //     console.log(priceLine);
+    //     chart.updateBtnElement('btnTakeProfit', 'line', priceLine);
+    //     chart.unsubscribeClick( clickHadlerTakeProfit );
+    // }
 
     
-    function clickHadlerStopLoss(param) {
-        const price = series.coordinateToPrice(param.point.y);
-        //console.log(price);
-        let priceLine = series.createPriceLine({
-            price : price,
-            color : 'red',
-            title : `Stop (${price})`
-        });
-        console.log(priceLine);
-        chart.updateBtnElement('btnStopLoss', 'line', priceLine);
-        chart.unsubscribeClick( clickHadlerStopLoss );
-    }
+    // function clickHadlerStopLoss(param) {
+    //     const price = series.coordinateToPrice(param.point.y);
+    //     //console.log(price);
+    //     let priceLine = series.createPriceLine({
+    //         price : price,
+    //         color : 'red',
+    //         title : `Stop (${price})`
+    //     });
+    //     console.log(priceLine);
+    //     chart.updateBtnElement('btnStopLoss', 'line', priceLine);
+    //     chart.unsubscribeClick( clickHadlerStopLoss );
+    // }
 
 
     //let indexOfMinPrice = LWC.findMin(data);
@@ -91,26 +112,26 @@ async function show(){
     series.setMarkers(markers);
     */
 
-    chart.bindBtnElement( document.querySelector('#btnTakeProfit'), 'btnTakeProfit', ()=>{
-        //alert('Hello!');
-        let line = chart.getBtnElementProp('btnTakeProfit', 'line');
-        if(line != null){
-            const response = series.removePriceLine(line);
-            console.log(response);
-        }
-        chart.subscribeClick( clickHadlerTakeProfit );
-    });
+    // chart.bindBtnElement( document.querySelector('#btnTakeProfit'), 'btnTakeProfit', ()=>{
+    //     //alert('Hello!');
+    //     let line = chart.getBtnElementProp('btnTakeProfit', 'line');
+    //     if(line != null){
+    //         const response = series.removePriceLine(line);
+    //         console.log(response);
+    //     }
+    //     chart.subscribeClick( clickHadlerTakeProfit );
+    // });
     
 
-    chart.bindBtnElement( document.querySelector('#btnStopLoss'), 'btnStopLoss', ()=>{
-        //alert('Hello!');
-        let line = chart.getBtnElementProp('btnStopLoss', 'line');
-        if(line != null){
-            const response = series.removePriceLine(line);
-            console.log(response);
-        }
-        chart.subscribeClick( clickHadlerStopLoss );
-    });
+    // chart.bindBtnElement( document.querySelector('#btnStopLoss'), 'btnStopLoss', ()=>{
+    //     //alert('Hello!');
+    //     let line = chart.getBtnElementProp('btnStopLoss', 'line');
+    //     if(line != null){
+    //         const response = series.removePriceLine(line);
+    //         console.log(response);
+    //     }
+    //     chart.subscribeClick( clickHadlerStopLoss );
+    // });
 }
 
 chart.show = show;

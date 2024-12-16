@@ -3,6 +3,7 @@ function init(){}
 
 async function bootLoader(){
     Symbols3.show();
+    // chart.show();
     // utils.show();
     // historical.show();
     //test.testPopup();

@@ -146,10 +146,18 @@ async function showAsset(el){
 
 }
 
+function changeColor(el, color_style='w3-yellow'){
+    let tableId = tableto.getTableIdByTdElement(el);
+    let asset = rowId = tableto.getRowIdByTdElement(el);
+
+    tableto.td(tableId, asset, 'symbol').setColor(color_style);
+}
+
 
 
 assets.getAssets = getAssets;
 assets.showAsset = showAsset;
+assets.changeColor = changeColor;
 window.assets = assets;
 
 })();
