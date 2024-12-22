@@ -43,13 +43,18 @@ function getAssetsFromBalance(dataBalancesHistory_raw){
     let LD_assets = {}
     for(let asset of assets){
         
-        if(asset.startsWith('LD')){
-            let LD_asset = asset.slice(2);
-            // console.log(asset, LD_asset);
-            assets.delete(asset);
-            assets.add(LD_asset);
-            LD_assets[LD_asset] = dataBalancesHistory_raw['actual']['data'][asset]['available']
+        try{
+            if(asset.startsWith('LD')){
+                let LD_asset = asset.slice(2);
+                // console.log(asset, LD_asset);
+                assets.delete(asset);
+                assets.add(LD_asset);
+                LD_assets[LD_asset] = dataBalancesHistory_raw['actual']['data'][asset]['available']
+            }
+        }catch(e){
+            console.error(asset, e)
         }
+
     }
     return [assets, LD_assets];
     // return [...assets];
