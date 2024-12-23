@@ -67,7 +67,7 @@ class Symbols3 {
             if($previousFile){
                 $filename = $previousFile['filename'];
                 $ans['previous'] = self::getBalance($filename);
-                $ans['previous']['timestamp'] = $actualFile['timestamp'];
+                $ans['previous']['timestamp'] = $previousFile['timestamp'];
                 $ans['data']['previous'] = $ans['previous'];
                 unset($ans['previous']);
             }
@@ -119,7 +119,7 @@ class Symbols3 {
             if($previousFile){
                 $filename = $previousFile['filename'];
                 $ans['previous'] = self::getPrice($filename);
-                $ans['previous']['timestamp'] = $actualFile['timestamp'];
+                $ans['previous']['timestamp'] = $previousFile['timestamp'];
                 $ans['data']['previous'] = $ans['previous'];
                 unset($ans['previous']);
             }

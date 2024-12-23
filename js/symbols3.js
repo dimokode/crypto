@@ -25,7 +25,11 @@
 
         let dataBalancesHistory_raw = await getBalances();
         console.log('dataBalancesHistory_raw', dataBalancesHistory_raw);
-
+        const actualBalanceTimestamp = dataBalancesHistory_raw['actual']['timestamp'];
+        const previousBalanceTimestamp = dataBalancesHistory_raw['previous']['timestamp'];
+        const actualBalanceDatetime = convertTimestampToDatetime(actualBalanceTimestamp*1000);
+        const previousBalanceDatetime = convertTimestampToDatetime(previousBalanceTimestamp*1000);
+        console.log(actualBalanceTimestamp, actualBalanceDatetime, previousBalanceTimestamp, previousBalanceDatetime);
 
 
         // const arrAssets = await assets.getAssets();
@@ -39,6 +43,11 @@
 
         let dataPrices = await getPrices();
         console.log('dataPrices', dataPrices);
+        const actualPriceTimestamp = dataPrices['actual']['timestamp'];
+        const previousPriceTimestamp = dataPrices['previous']['timestamp'];
+        const actualPriceDatetime = convertTimestampToDatetime(actualPriceTimestamp*1000);
+        const previousPriceDatetime = convertTimestampToDatetime(previousPriceTimestamp*1000);
+        console.log(actualPriceTimestamp, actualPriceDatetime, previousPriceTimestamp, previousPriceDatetime);
 
 
 
@@ -93,6 +102,10 @@
         $('totalAmount').html(totalAmount.toFixed(2));
         $('actualBalance').html(actualBalance.toFixed(2));
         $('usdtBalance').html(usdtBalance.toFixed(2));
+        $('actualBalanceDatetime').html(actualBalanceDatetime);
+        $('previousBalanceDatetime').html(previousBalanceDatetime);
+        $('actualPriceDatetime').html(actualPriceDatetime);
+        $('previousPriceDatetime').html(previousPriceDatetime);
 
     }
 
