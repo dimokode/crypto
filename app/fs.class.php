@@ -210,7 +210,7 @@ class fs {
 
     static function getJSONFromFile($path_to_folder, $filename, $key = ''){
         $ans['success'] = false;
-        $path_to_file = $path_to_folder.$filename;
+        $path_to_file = $path_to_folder."/".$filename;
         if(file_exists($path_to_file)){
             $arrTemp = file_get_contents($path_to_file);
             //wrlog($arrTemp);
@@ -232,6 +232,8 @@ class fs {
         }
         return $ans;
     }
+
+
 
     static public function backupFile($path_to_source_folder, $filename, $path_to_backup_folder=NULL){
         if(!isset($path_to_backup_folder)){

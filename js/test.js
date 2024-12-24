@@ -216,6 +216,11 @@ async function links(){
     popup.body().insert(htmlPopup);
 }
 
+async function getAssetName(){
+    const asset_name = await assets.getAssetName('BTC');
+    console.log(asset_name);
+}
+
 
 test.test = test;
 test.show = show;
@@ -225,6 +230,7 @@ test.getSocket = getSocket;
 test.closeSocket = closeSocket;
 test.testPopup = testPopup;
 test.links = links;
+test.getAssetName = getAssetName;
 window.test = test;
 
 })();

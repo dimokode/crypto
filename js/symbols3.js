@@ -1037,10 +1037,12 @@
         })
     }
 
-    function showSymbolInfo(assetId){
+    async function showSymbolInfo(assetId){
         console.log('showSymbolInfo');
         const popupId = popup.new();
         popup.show(popupId);
+
+        const asset_name = await assets.getAssetName(assetId);
 
         template.loadRawTemplateByName('symbolinfo.html').then(content => {
             if(content){
@@ -1049,6 +1051,7 @@
                     tpl : content,
                     tags : {
                         symbol : assetId,
+                        asset_name
                     }
                 });
                 //console.log(content)

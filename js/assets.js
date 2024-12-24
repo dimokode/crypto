@@ -159,10 +159,26 @@ function changeColor(el, color_style='w3-yellow'){
 }
 
 
+function getAssetName(asset){
+    return common.sendAjax({
+        controller: 'assets',
+        action: 'getAssetName',
+        asset
+    }).then( response => {
+        if(response.success){
+            // console.log(response);
+            return response.data.website_slug;
+        }else{
+            console.error(response.error);
+        }
+    })
+}
+
 
 assets.getAssets = getAssets;
 assets.showAsset = showAsset;
 assets.changeColor = changeColor;
+assets.getAssetName = getAssetName;
 window.assets = assets;
 
 })();
