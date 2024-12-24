@@ -68,6 +68,7 @@ function saveDataToFile(folder, filename, data){
 
 }
 
+// todo - rename this function
 async function getHistoricalDataForSymbol(symbol, timeframe = '1d', startTime=1502928000000){
     let stop = false;
     let counter = 0;
@@ -145,51 +146,105 @@ function getTimeStampForEndOfTheDay(timestamp, timeOffsets = [2, 3]){
     const localTimezoneOffset = getTimezoneOffset();
     const timezoneOffset = localTimezoneOffset - exchangeTimezoneOffset;
     let d = new Date(timestamp);
+    console.log(d);
     // let d2 = new Date(d.getFullYear(), d.getMonth()+1, d.getDate(), d.getHours() + timezoneOffset);
-    let d2 = new Date(d.getFullYear(), d.getMonth()+1, d.getDate(), 3);
+    // let d2 = new Date(d.getFullYear(), d.getMonth()+1, d.getDate(), 3);
     const result = timeOffsets.map( timeOffset => {
-        return new Date(d.getFullYear(), d.getMonth()+1, d.getDate(), timeOffset).getTime();
+        // return new Date(d.getFullYear(), d.getMonth()+1, d.getDate(), timeOffset).getTime();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate(), timeOffset).getTime();
     });
     // return d2.getTime();
     return result;
+}
+
+function testGetTimeStampForEndOfTheDay(timestamp){
+    console.log(timestamp, convertTimestampToDatetime(timestamp));
+    tss = getTimeStampForEndOfTheDay(timestamp)
+    console.log(tss);
+    dts = tss.map(item => {
+        return convertTimestampToDatetime(item)
+    })
+    console.log(dts);
 }
 
 function getTimezoneOffset(){
     return (new Date().getTimezoneOffset())/60 * -1;
 }
 
+
 function getPriceForTimestamp(tss, data){
     return data[tss[0]] != undefined ? data[tss[0]] : data[tss[1]];
 }
 
-async function getPriceForTime(symbol, ts, timeframe='1d'){
-    console.log(ts);
-    const readResult = await fs.readDataFromFile({
+function getHistoricalDataBySymbol(symbol, timeframe){
+    return fs.readDataFromFile({
         folder: `history/${symbol}`,
         filename: `${symbol}_${timeframe}.txt`,
+    }).then( response => {
+        if(response.success){
+            return response.data;
+        }else{
+            console.error(response.error);
+            return false;
+        }
     });
+}
 
-    if(readResult.success){
-        const data = readResult.data;
-        console.log(data);
+
+async function getPriceForTime(symbol, ts, timeframe='1d'){
+    console.log(ts, convertTimestampToDatetime(ts));
+    const data = await getHistoricalDataBySymbol(symbol, timeframe);
+
+    if(data){
+        // console.log(data);
         // for(let dd in data){
         //     console.log(convertTimestampToDatetime(Number(dd)));
         // }
         // tss = convertTimestampToDatetime(ts);
-        const tz_off = getTimezoneOffset();
-        console.log(tz_off);
+        // const tz_off = getTimezoneOffset();
+        // console.log(tz_off);
         let tss = getTimeStampForEndOfTheDay(ts);
         console.log(tss);
         let price = getPriceForTimestamp(tss, data);
+        // console.log(price);
         // console.log(ts, convertTimestampToDatetime(ts), d, convertTimestampToDatetime(d));
         // console.log(d, convertTimestampToDatetime(d), data[d], data[String(d)]);
         console.log(price['close']);
         return price['close'];
 
-    }else{
-        console.error(readResult.error);
     }
 }
+
+
+// async function getPriceForTime(symbol, ts, timeframe='1d'){
+//     console.log(ts);
+//     const readResult = await fs.readDataFromFile({
+//         folder: `history/${symbol}`,
+//         filename: `${symbol}_${timeframe}.txt`,
+//     });
+
+//     if(readResult.success){
+//         const data = readResult.data;
+//         console.log(data);
+//         // for(let dd in data){
+//         //     console.log(convertTimestampToDatetime(Number(dd)));
+//         // }
+//         // tss = convertTimestampToDatetime(ts);
+//         const tz_off = getTimezoneOffset();
+//         console.log(tz_off);
+//         let tss = getTimeStampForEndOfTheDay(ts);
+//         console.log(tss);
+//         let price = getPriceForTimestamp(tss, data);
+//         // console.log(price);
+//         // console.log(ts, convertTimestampToDatetime(ts), d, convertTimestampToDatetime(d));
+//         // console.log(d, convertTimestampToDatetime(d), data[d], data[String(d)]);
+//         console.log(price['close']);
+//         return price['close'];
+
+//     }else{
+//         console.error(readResult.error);
+//     }
+// }
 
 
 function getDateSpan(symbol, timeframe){
@@ -198,7 +253,12 @@ function getDateSpan(symbol, timeframe){
         const tss = Object.keys(data).map(item => {
             return item;
         });
-        console.log(tss, tss.min(), tss.max());
+        const ts_min = tss.min();
+        const dt_min = convertTimestampToDatetime(ts_min);
+        const ts_max = tss.max();
+        const dt_max = convertTimestampToDatetime(ts_max);
+        // console.log(tss, tss.min(), tss.max());
+        console.table(ts_min, dt_min, ts_max, dt_max);
     });
 }
 
@@ -241,8 +301,10 @@ function test(){
 
 historical.show = show;
 historical.getHistoricalDataForSymbol = getHistoricalDataForSymbol;
+historical.getTimeStampForEndOfTheDay = getTimeStampForEndOfTheDay;
 historical.getPriceForTime = getPriceForTime;
 historical.getDateSpan = getDateSpan;
+historical.testGetTimeStampForEndOfTheDay = testGetTimeStampForEndOfTheDay;
 historical.getServerTime = getServerTime;
 historical.test = test;
 window.historical = historical;

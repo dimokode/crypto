@@ -14,9 +14,12 @@ class Config {
         'USDT', 'USDC', 'BUSD', 'BTC', 'ETH', 'BNB'
     ]
 
+    static crossAssets = ['BTC', 'ETH']
+
     constructor(){
         this.config = {
-            exchangeAssets: this.constructor.exchangeAssets
+            exchangeAssets: this.constructor.exchangeAssets,
+            crossAssets: this.constructor.crossAssets
         }
     }
 

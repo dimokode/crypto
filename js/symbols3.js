@@ -940,10 +940,20 @@
         for(let item in orders){
             let order = orders[item];
 
-            if(order.symbol == asset+'BTC'){
-                order.price = await historical.getPriceForTime('BTCUSDT', order.time) * order.price;
-                console.log('order.price', order.price);
+            // calculate asset price relative cross asset (example to BTC or ETH) at the moment of order
+            const re = new RegExp(`${asset}`, "g");
+            const splitter = order.symbol.split(re);
+            if(splitter.length == 2){
+                const asset_to = splitter[1];
+                console.log('asset_to', asset_to);
+                if(config.crossAssets.includes(asset_to)){
+                    const priceCrossAsset = await historical.getPriceForTime(asset_to+'USDT', order.time);
+                    order.price = priceCrossAsset * order.price;
+                    // console.log('order.price', order.price);
+                    console.log(asset_to+'USDT', convertTimestampToDatetime(order.time), priceCrossAsset);
+                }
             }
+
             order['quoteQty'] = order['qty'] * order['price'];
             // if the trade operation was carried out at the actual price
             order['actualAmount'] = price * order['qty'];

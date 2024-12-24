@@ -257,7 +257,7 @@ function addCheckboxes(tableId){
 
 
 function addRow(tableId = null, rowData = null){
-    //console.log(rowData);
+    console.log(rowData);
     if(tableId === null){
         tableId = 'tableto';
     }
