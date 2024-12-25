@@ -209,6 +209,7 @@ class fs {
 
 
     static function getJSONFromFile($path_to_folder, $filename, $key = ''){
+        // Logger::info($key);
         $ans['success'] = false;
         $path_to_file = $path_to_folder."/".$filename;
         if(file_exists($path_to_file)){

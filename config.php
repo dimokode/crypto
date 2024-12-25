@@ -45,6 +45,8 @@ spl_autoload_register(function ($classname) {
     //throw new Exception("Невозможно загрузить $classname.");
 });
 
+
+Logger::getInstance();
 //создаем объект БД
 DB::getInstance();
 //echo TPL_DIR;
