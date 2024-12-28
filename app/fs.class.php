@@ -214,13 +214,24 @@ class fs {
         $path_to_file = $path_to_folder."/".$filename;
         if(file_exists($path_to_file)){
             $arrTemp = file_get_contents($path_to_file);
+            // Logger::info($arrTemp);
+            $decoded_array = json_decode($arrTemp);
+            // Logger::info($decoded_array);
             //wrlog($arrTemp);
             if($arrTemp !== false ){
                 $ans['success'] = true;
                 if($key == ""){
-                    $ans['data'] = json_decode($arrTemp);
+                    $ans['data'] = $decoded_array;
+                    // $ans['data'] = $arrTemp;
                 }else{
-                    $ans['data'] = json_decode($arrTemp)->$key;
+                    // Logger::info($key." == ".$decoded_array->$key);
+                    if(property_exists($decoded_array, $key)){
+                        $ans['data'] = $decoded_array->$key;
+                    }else{
+                        $ans['error'] = "$key doesn't exist";
+                        $ans['success'] = false;
+                    }
+                    // $ans['data'] = $arrTemp->$key;
                 }
                 //wrlog($ans['data']);
             }else{

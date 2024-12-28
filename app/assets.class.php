@@ -2,6 +2,8 @@
 class Assets {
 
     static public function getAssetName($params){
+        Logger::clear();
+
         $params = json_decode($params, true);
         $asset = $params['asset'];
 

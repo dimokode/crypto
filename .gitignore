@@ -9,6 +9,7 @@ composer.phar
 
 /db/
 /logs/
+/logger/
 /phplightadmin/
 
 /*.txt
